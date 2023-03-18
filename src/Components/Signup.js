@@ -23,15 +23,17 @@ const Signup = () => {
     e.preventDefault();
 
     const permEmail = "@" + email.split("@")[1];
-    const emailQuery = query(emailDocRef, where("permEmails", "==", permEmail));
+    const emailQuery = query(
+      emailDocRef,
+      where("permEmails", "==", permEmail),
+      where("isActive", "==", true)
+    );
     getDocs(emailQuery).then((response) => {
       if (response.empty) console.log("oops");
       else {
         response.forEach((uni) => {
           createUserWithEmailAndPassword(auth, email, password)
             .then((res) => {
-              SessionService.setUni({ ...uni.data(), id: uni.id });
-
               setDoc(doc(db, "users", res.user.uid), {
                 email: email,
                 majorId: "",

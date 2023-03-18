@@ -1,17 +1,10 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../Config";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { db } from "../Config";
-import {
-  setDoc,
-  doc,
-  getDoc,
-  query,
-  where,
-  collection,
-  getDocs,
-} from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
+import { SessionService } from "../SessionService";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -24,21 +17,21 @@ const Login = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
-        const user = userCredential.user;
+
         getDoc(doc(db, "users", userCredential.user.uid)).then((response) => {
-          console.log(response.data().uniId);
-          navigate(`./home/${response.data().uniId}`);
+          SessionService.setUser({
+            ...response.data(),
+            id: userCredential.user.uid,
+          });
+          response.data().name
+            ? navigate(`/home/${response.data().uniId}`)
+            : navigate(`/CompleteProfile`);
         });
-        console.log(user);
-        // ...
       })
       .catch((error) => {
         console.log(error);
-        // ..
       });
   };
-  //   console.log(email);
-  //   console.log(password);
 
   return (
     <>
@@ -57,6 +50,7 @@ const Login = () => {
         />
         <button type="submit">Login</button>
       </form>
+      <Link to="/signup">Are you new here? Signup</Link>
     </>
   );
 };

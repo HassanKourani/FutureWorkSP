@@ -25,7 +25,7 @@ const Signup = () => {
     const permEmail = "@" + email.split("@")[1];
     const emailQuery = query(
       emailDocRef,
-      where("permEmails", "==", permEmail),
+      where("permEmail", "==", permEmail),
       where("isActive", "==", true)
     );
     getDocs(emailQuery).then((response) => {

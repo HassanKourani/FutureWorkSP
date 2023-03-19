@@ -8,7 +8,7 @@ const Login = () => {
     <>
       <button onClick={() => setClicked("user")}>User</button>
       <button onClick={() => setClicked("inst")}>Inst</button>
-      {clicked == "user" ? <UserLogin /> : <InstitutionLogin />}
+      {clicked === "user" ? <UserLogin /> : <InstitutionLogin />}
     </>
   );
 };

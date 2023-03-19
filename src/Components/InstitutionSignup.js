@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { auth, db, storage } from "../Config";
 import {
   query,
@@ -20,18 +20,6 @@ const InstitutionSignup = () => {
   const [permEmail, setPermEmail] = useState("");
   const [message, setMessage] = useState("");
   const [file, setFile] = useState("");
-  const [fileLink, setFileLink] = useState("");
-
-  //   useEffect(() => {
-  //     if (file) {
-  //       const fileRef = ref(storage, file.name);
-  //       uploadBytes(fileRef, file).then(() => {
-  //         getDownloadURL(fileRef).then((url) => {
-  //           setFileLink(url);
-  //         });
-  //       });
-  //     }
-  //   }, [file]);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();

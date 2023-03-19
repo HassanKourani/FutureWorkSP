@@ -57,6 +57,7 @@ const InstitutionSignup = () => {
                     //setFileLink(url);
 
                     addDoc(collection(db, "requests"), {
+                      uniName: uniName,
                       docLink: url,
                       message: message,
                       uniId: Institution.id,
@@ -119,6 +120,7 @@ const InstitutionSignup = () => {
         <br />
         <input
           type="file"
+          accept="image/*"
           onChange={(e) => {
             if (e.target.files[0]) setFile(e.target.files[0]);
           }}

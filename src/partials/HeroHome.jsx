@@ -63,7 +63,7 @@ function HeroHome() {
               sharing of knowledge, skills, and ideas among a community of
               learners.
             </p>
-            <div className="max-w-xs mx-auto sm:max-w-none sm:flex sm:justify-center">
+            {/* <div className="max-w-xs mx-auto sm:max-w-none sm:flex sm:justify-center">
               <div data-aos="fade-up" data-aos-delay="400">
                 <Link
                   className="btn text-white bg-purple-600 hover:bg-purple-700 w-full mb-4 sm:w-auto sm:mb-0"
@@ -80,7 +80,7 @@ function HeroHome() {
                   Institution
                 </a>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Hero image */}

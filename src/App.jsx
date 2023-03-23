@@ -32,8 +32,8 @@ function App() {
     <>
       <Routes>
         <Route exact path="/" element={<Home />} />
-        <Route path="/users/signin" element={<UsersSignIn />} />
-        <Route path="/users/signup" element={<UsersSignUp />} />
+        <Route path="/signin" element={<UsersSignIn />} />
+        <Route path="/signup" element={<UsersSignUp />} />
         {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
       </Routes>
     </>

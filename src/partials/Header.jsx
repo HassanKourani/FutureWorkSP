@@ -53,34 +53,33 @@ function Header() {
             </Link>
           </div>
           {/* Desktop navigation */}
-          {path != "/" && (
-            <></>
-            // <nav className="hidden md:flex md:grow">
-            //   {/* Desktop sign in links */}
-            //   <ul className="flex grow justify-end flex-wrap items-center">
-            //     <li>
-            //       <Link
-            //         to="/signin"
-            //         className="font-medium text-purple-600 hover:text-gray-200 px-4 py-3 flex items-center transition duration-150 ease-in-out"
-            //       >
-            //         Sign in
-            //       </Link>
-            //     </li>
-            //     <li>
-            //       <Link
-            //         to="/signup"
-            //         className="btn-sm text-white bg-purple-600 hover:bg-purple-700 ml-3"
-            //       >
-            //         Sign up
-            //       </Link>
-            //     </li>
-            //   </ul>
-            // </nav>
-          )}
+
+          <nav className="hidden md:flex md:grow">
+            {/* Desktop sign in links */}
+            <ul className="flex grow justify-end flex-wrap items-center">
+              <li>
+                <Link
+                  to="/signin"
+                  className="font-medium text-purple-600 hover:text-gray-200 px-4 py-3 flex items-center transition duration-150 ease-in-out"
+                >
+                  Sign in
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/signup"
+                  className="btn-sm text-white bg-purple-600 hover:bg-purple-700 ml-3"
+                >
+                  Sign up
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
           {/* Mobile menu */}
-          {/* <div className="md:hidden"> */}
-          {/* Hamburger button */}
-          {/* <button
+          <div className="md:hidden">
+            {/* Hamburger button */}
+            <button
               ref={trigger}
               className={`hamburger ${mobileNavOpen && "active"}`}
               aria-controls="mobile-nav"
@@ -97,10 +96,10 @@ function Header() {
                 <rect y="11" width="24" height="2" rx="1" />
                 <rect y="18" width="24" height="2" rx="1" />
               </svg>
-            </button> */}
+            </button>
 
-          {/*Mobile navigation */}
-          {/* <nav
+            {/* Mobile navigation */}
+            <nav
               id="mobile-nav"
               ref={mobileNav}
               className="absolute top-full z-20 left-0 w-full px-4 sm:px-6 overflow-hidden transition-all duration-300 ease-in-out"
@@ -128,8 +127,8 @@ function Header() {
                   </Link>
                 </li>
               </ul>
-            </nav> */}
-          {/* </div> */}
+            </nav>
+          </div>
         </div>
       </div>
     </header>

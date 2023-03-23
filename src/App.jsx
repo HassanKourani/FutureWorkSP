@@ -9,12 +9,6 @@ import AOS from "aos";
 import Home from "./pages/Home";
 import UsersSignIn from "./pages/Users/UsersSignIn";
 import UsersSignUp from "./pages/Users/UsersSignUp";
-import ResetPassword from "./pages/ResetPassword";
-import InstitutionsSignIn from "./pages/Institutions/InstitutionsSignIn";
-import InstitutionsSignUp from "./pages/Institutions/InstitutionsSignUp";
-import Requests from "./pages/SuperAdmins/Requests";
-import AddSuperAdmin from "./pages/SuperAdmins/AddSuperAdmin";
-import RequestDetails from "./pages/SuperAdmins/RequestDetails";
 
 function App() {
   const location = useLocation();
@@ -40,14 +34,6 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route path="/users/signin" element={<UsersSignIn />} />
         <Route path="/users/signup" element={<UsersSignUp />} />
-        <Route path="/institution/signin" element={<InstitutionsSignIn />} />
-        <Route path="/institution/signup" element={<InstitutionsSignUp />} />
-        <Route path="/admins/:adminId/requests" element={<Requests />} />
-        <Route path="/admins/:adminId/add" element={<AddSuperAdmin />} />
-        <Route
-          path="/admins/:adminId/requests/:requestId"
-          element={<RequestDetails />}
-        />
         {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
       </Routes>
     </>

@@ -1,6 +1,6 @@
 import React from "react";
 
-import Header from "../../partials/Header";
+import MainHeader from "./MainHeader";
 import PageIllustration from "../../partials/PageIllustration";
 import Banner from "../../partials/Banner";
 
@@ -9,47 +9,40 @@ import { auth } from "../../Config";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { db } from "../../Config";
-import { doc, getDoc } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { SessionService } from "../../SessionService";
+import "./Main.css"
 
-function UsersSignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+function CreateCollab() {
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
   const navigate = useNavigate();
-
+  const user = SessionService.getUser();
+  const domain = user.email.split("@")[1]
+  
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-
-        getDoc(doc(db, "users", userCredential.user.uid)).then((response) => {
-          SessionService.setUser({
-            ...response.data(),
-            id: userCredential.user.uid,
-          });
-         navigate(`/main`);
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    addDoc(collection(db,"collaborations"),{
+      description:description,
+      domain:domain,
+      uid:user.id,
+      isPrivate:isPrivate,
+      title:title
+    } ).then(()=>{navigate(`/main`)})
+   
   };
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       {/*  Site header */}
-      <Header />
+      <MainHeader />
 
       {/*  Page content */}
       <main className="grow">
-        {/*  Page illustration */}
-        <div
-          className="relative max-w-6xl mx-auto h-0 pointer-events-none"
-          aria-hidden="true"
-        >
-          <PageIllustration />
-        </div>
+      
 
         <section className="relative">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -57,7 +50,7 @@ function UsersSignIn() {
               {/* Page header */}
               <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
                 <h1 className="h1">
-                  Welcome back. We exist to make your studying easier.
+                 Create a new collab
                 </h1>
               </div>
 
@@ -68,17 +61,17 @@ function UsersSignIn() {
                     <div className="w-full px-3">
                       <label
                         className="block text-gray-300 text-sm font-medium mb-1"
-                        htmlFor="email"
+                        htmlFor="title"
                       >
-                        Email
+                        Title
                       </label>
                       <input
-                        id="email"
-                        type="email"
+                        id="title"
+                        type="text"
                         className="form-input w-full text-gray-300"
-                        placeholder="you@yourcompany.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
                         required
                       />
                     </div>
@@ -87,21 +80,30 @@ function UsersSignIn() {
                     <div className="w-full px-3">
                       <label
                         className="block text-gray-300 text-sm font-medium mb-1"
-                        htmlFor="password"
+                        htmlFor="description"
                       >
-                        Password
+                        Description
                       </label>
                       <input
-                        id="password"
-                        type="password"
+                        id="description"
+                        type="text"
                         className="form-input w-full text-gray-300"
-                        placeholder="Password (at least 10 characters)"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                         required
                       />
                     </div>
                   </div>
+
+                    
+                    <div className="cntr">
+                        <input checked={isPrivate} type="checkbox" id="cbx" className="hidden-xs-up" onChange={(e)=>setIsPrivate(e.target.checked)} />
+                        <label htmlFor="cbx" className="cbx"></label>
+                        <label>Private?</label>
+                    </div>
+                    
+                 
 
                   <div className="flex flex-wrap -mx-3 mt-6">
                     <div className="w-full px-3">
@@ -109,20 +111,12 @@ function UsersSignIn() {
                         className="btn text-white bg-purple-600 hover:bg-purple-700 w-full"
                         type="submit"
                       >
-                        Sign in
+                        Create
                       </button>
                     </div>
                   </div>
                 </form>
-                <div className="text-gray-400 text-center mt-6">
-                  Don't you have an account?{" "}
-                  <Link
-                    to="/signup"
-                    className="text-purple-600 hover:text-gray-200 transition duration-150 ease-in-out"
-                  >
-                    Sign up
-                  </Link>
-                </div>
+                
               </div>
             </div>
           </div>
@@ -134,4 +128,4 @@ function UsersSignIn() {
   );
 }
 
-export default UsersSignIn;
+export default CreateCollab;

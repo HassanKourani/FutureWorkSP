@@ -20,6 +20,7 @@ import { SessionService } from "../../SessionService";
 function UsersSignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name , setName] = useState("");
 
   const emailDocRef = collection(db, "Institutions");
   const navigate = useNavigate();
@@ -27,41 +28,24 @@ function UsersSignUp() {
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    const permEmail = "@" + email.split("@")[1];
-    const emailQuery = query(
-      emailDocRef,
-      where("permEmail", "==", permEmail),
-      where("isActive", "==", true)
-    );
-    getDocs(emailQuery).then((response) => {
-      if (response.empty) console.log("oops");
-      else {
-        response.forEach((uni) => {
-          createUserWithEmailAndPassword(auth, email, password)
+         createUserWithEmailAndPassword(auth, email, password)
             .then((res) => {
               setDoc(doc(db, "users", res.user.uid), {
                 email: email,
-                majorId: "",
-                name: "",
-                uniId: uni.id,
+                name: name,
+                
               }).then(() => {
                 SessionService.setUser({
                   id: res.user.uid,
                   email: email,
-                  majorId: "",
-                  name: "",
-                  uniId: uni.id,
+                  name: name,
+                 
                 });
 
-                navigate(`/CompleteProfile`);
+                navigate(`/main`);
               });
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        });
-      }
-    });
+            }).catch(error=> {console.log(error)})
+    
   };
 
   return (
@@ -106,6 +90,8 @@ function UsersSignUp() {
                         className="form-input w-full text-gray-300"
                         placeholder="First and last name"
                         required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                       />
                     </div>
                   </div>
@@ -164,7 +150,7 @@ function UsersSignUp() {
                       />
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500 text-center">
+                  {/* <div className="text-sm text-gray-500 text-center">
                     I agree to be contacted by Open PRO about this offer as per
                     the Open PRO{" "}
                     <Link
@@ -174,7 +160,7 @@ function UsersSignUp() {
                       Privacy Policy
                     </Link>
                     .
-                  </div>
+                  </div> */}
                   <div className="flex flex-wrap -mx-3 mt-6">
                     <div className="w-full px-3">
                       <button
@@ -187,9 +173,9 @@ function UsersSignUp() {
                   </div>
                 </form>
                 <div className="text-gray-400 text-center mt-6">
-                  Already using Open PRO?{" "}
+                  Already have an account?{" "}
                   <Link
-                    to="/users/signin"
+                    to="/signin"
                     className="text-purple-600 hover:text-gray-200 transition duration-150 ease-in-out"
                   >
                     Sign in

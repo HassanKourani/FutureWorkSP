@@ -1,24 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateQuestion from "./CreateQuestion";
 import Discussions from "./Discussions";
 
 const Collaboration = () => {
-  const [currentComponent, setCurrentComponent] = useState(<Discussions />);
+  const [currentComponent, setCurrentComponent] = useState();
   const [currentComponentName, setCurrentComponentName] =
     useState("discussions");
 
+  useEffect(() => {
+    setCurrentComponent(
+      <Discussions setCurrentComponent={setCurrentComponent} />
+    );
+  }, []);
+
   const handleSidebarClick = (component) => {
     if (component == "discussions") {
-      setCurrentComponent(<Discussions />);
+      setCurrentComponent(
+        <Discussions setCurrentComponent={setCurrentComponent} />
+      );
       setCurrentComponentName(component);
     }
   };
+
   const handleSidebarPost = () => {
-    if (currentComponentName == "discussions")
+    if (currentComponentName == "discussions") {
       setCurrentComponent(
         <CreateQuestion setCurrentComponent={setCurrentComponent} />
       );
-    console.log(currentComponent);
+      console.log(currentComponent);
+    }
   };
 
   return (
@@ -350,7 +360,7 @@ const Collaboration = () => {
             </ul>
           </div>
         </aside>
-        <div className="pt-20 pl-4 sm:ml-64">{currentComponent}</div>
+        <div className="pt-20 pl-4 sm:ml-64 ">{currentComponent}</div>
       </div>
     </>
   );

@@ -1,7 +1,8 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { db } from "../../Config";
+import { db, storage } from "../../Config";
 import { SessionService } from "../../SessionService";
 import Discussions from "./Discussions";
 
@@ -12,28 +13,63 @@ const CreateQuestion = ({ setCurrentComponent }) => {
   const user = SessionService.getUser();
   const uid = useParams().uid;
   const [isLoading, setIsLoading] = useState(false);
+  const [img, setImg] = useState("");
+
+  const handleAddImage = (e) => {
+    e.preventDefault();
+    e.target.files[0] && setImage(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      setImg(URL.createObjectURL(e.target.files[0]));
+    }
+  };
 
   const handleFormSubmit = (e) => {
-    console.log("one");
     e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
-    addDoc(collection(db, "collaborations", uid, "discussions"), {
-      title: title,
-      question: question,
-      image: image,
-      userId: user.id,
-      userName: user.name,
-      isAnswered: false,
-    })
-      .then(() => {
-        console.log("craeted");
-        setIsLoading(false);
-        setCurrentComponent(<Discussions />);
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsLoading(false);
+
+    if (image) {
+      const imageRef = ref(storage, image.name);
+      uploadBytes(imageRef, image).then(() => {
+        getDownloadURL(imageRef).then((url) => {
+          addDoc(collection(db, "collaborations", uid, "discussions"), {
+            title: title,
+            question: question,
+            image: url,
+            userId: user.id,
+            userName: user.name,
+            isAnswered: false,
+            createdAt: serverTimestamp(),
+          })
+            .then(() => {
+              setIsLoading(false);
+              setCurrentComponent(<Discussions />);
+            })
+            .catch((err) => {
+              console.log(err);
+              setIsLoading(false);
+            });
+        });
       });
+    } else {
+      addDoc(collection(db, "collaborations", uid, "discussions"), {
+        title: title,
+        question: question,
+        image: "",
+        userId: user.id,
+        userName: user.name,
+        isAnswered: false,
+        createdAt: serverTimestamp(),
+      })
+        .then(() => {
+          setIsLoading(false);
+          setCurrentComponent(<Discussions />);
+        })
+        .catch((err) => {
+          console.log(err);
+          setIsLoading(false);
+        });
+    }
   };
 
   return (
@@ -64,7 +100,7 @@ const CreateQuestion = ({ setCurrentComponent }) => {
                 type="submit"
                 className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
               >
-                Post question
+                {isLoading ? "Loading..." : "Post question"}
               </button>
               <div className="flex pl-0 space-x-1 sm:pl-2">
                 <label
@@ -89,7 +125,7 @@ const CreateQuestion = ({ setCurrentComponent }) => {
                     id="image"
                     accept="image/*"
                     className="hidden"
-                    //   onChange={onChangeImage}
+                    onChange={handleAddImage}
                   />
                 </label>
               </div>
@@ -112,7 +148,7 @@ const CreateQuestion = ({ setCurrentComponent }) => {
         <div className="pl-8 pt-2">
           <h1 className="font-bold">{title ? title : "Title"}</h1>
           <p className="mt-1">{question ? question : "Description"}</p>
-          {/* {question.image ? <img /> : <></>} */}
+          {image ? <img src={img} /> : <></>}
         </div>
       </div>
     </>

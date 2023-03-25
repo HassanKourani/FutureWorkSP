@@ -1,31 +1,36 @@
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../../Config";
 import QuestionCard from "../../utils/QuestionCard";
+import Discussion from "./Discussion";
 
-const Discussions = () => {
-  const question = {
-    title: "title",
-    name: "name",
-    isAnswered: true,
-    question: "bla",
-  };
+const Discussions = ({ setCurrentComponent }) => {
   const uid = useParams().uid;
   const [discussions, setDiscussions] = useState();
 
   const discussionColRef = collection(db, "collaborations", uid, "discussions");
+  const q = query(discussionColRef, orderBy("createdAt", "desc"));
+
+  const handleOnClick = (e, discussion) => {
+    e.preventDefault();
+    setCurrentComponent(<Discussion discussionId={discussion.id} />);
+  };
 
   useEffect(() => {
-    onSnapshot(discussionColRef, (snapshot) => {
+    onSnapshot(q, (snapshot) => {
       setDiscussions(
         snapshot.docs.map((discussion) => (
-          <QuestionCard question={discussion.data()} />
+          <QuestionCard
+            question={discussion.data()}
+            key={discussion.id}
+            onClick={(e) => handleOnClick(e, discussion)}
+          />
         ))
       );
     });
   }, []);
-  console.log(discussions);
+
   return (
     <>
       <form className="pr-4 mb-4">

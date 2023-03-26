@@ -11,29 +11,29 @@ import { Link, useNavigate } from "react-router-dom";
 import { db } from "../../Config";
 import { addDoc, collection } from "firebase/firestore";
 import { SessionService } from "../../SessionService";
-import "./Main.css"
-
+import "./Main.css";
 
 function CreateCollab() {
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const navigate = useNavigate();
   const user = SessionService.getUser();
-  const domain = user.email.split("@")[1]
-  
+  const domain = user.email.split("@")[1];
+
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    addDoc(collection(db,"collaborations"),{
-      description:description,
-      domain:domain,
-      uid:user.id,
-      isPrivate:isPrivate,
-      title:title
-    } ).then(()=>{navigate(`/main`)})
-   
+    addDoc(collection(db, "collaborations"), {
+      description: description,
+      domain: domain,
+      uid: user.id,
+      isPrivate: isPrivate,
+      title: title,
+    }).then((res) => {
+      const usersColRef = collection(db, "collaborations", res.id, "users");
+      addDoc(usersColRef, { userId: user.id }).then(() => navigate("/main"));
+    });
   };
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
@@ -42,16 +42,12 @@ function CreateCollab() {
 
       {/*  Page content */}
       <main className="grow">
-      
-
         <section className="relative">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="pt-32 pb-12 md:pt-40 md:pb-20">
               {/* Page header */}
               <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
-                <h1 className="h1">
-                 Create a new collab
-                </h1>
+                <h1 className="h1">Create a new collab</h1>
               </div>
 
               {/* Form */}
@@ -96,14 +92,17 @@ function CreateCollab() {
                     </div>
                   </div>
 
-                    
-                    <div className="cntr">
-                        <input checked={isPrivate} type="checkbox" id="cbx" className="hidden-xs-up" onChange={(e)=>setIsPrivate(e.target.checked)} />
-                        <label htmlFor="cbx" className="cbx"></label>
-                        <label>Private?</label>
-                    </div>
-                    
-                 
+                  <div className="cntr">
+                    <input
+                      checked={isPrivate}
+                      type="checkbox"
+                      id="cbx"
+                      className="hidden-xs-up"
+                      onChange={(e) => setIsPrivate(e.target.checked)}
+                    />
+                    <label htmlFor="cbx" className="cbx"></label>
+                    <label>Private?</label>
+                  </div>
 
                   <div className="flex flex-wrap -mx-3 mt-6">
                     <div className="w-full px-3">
@@ -116,7 +115,6 @@ function CreateCollab() {
                     </div>
                   </div>
                 </form>
-                
               </div>
             </div>
           </div>

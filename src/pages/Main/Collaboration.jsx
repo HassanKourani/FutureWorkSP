@@ -1,11 +1,34 @@
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { db } from "../../Config";
+import { SessionService } from "../../SessionService";
 import CreateQuestion from "./CreateQuestion";
 import Discussions from "./Discussions";
+import Requests from "./Requests";
 
 const Collaboration = () => {
   const [currentComponent, setCurrentComponent] = useState();
   const [currentComponentName, setCurrentComponentName] =
     useState("discussions");
+  const uid = useParams().uid;
+  const [isPrivate, setIsPrivate] = useState(true);
+  const [isJoined, setIsJoined] = useState(false);
+  const user = SessionService.getUser();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate();
+  const collaborationDocRef = doc(db, "collaborations", uid);
+  const usersColRef = collection(db, "collaborations", uid, "users");
+  const userQuery = query(usersColRef, where("userId", "==", user.id));
 
   useEffect(() => {
     setCurrentComponent(
@@ -14,6 +37,10 @@ const Collaboration = () => {
   }, []);
 
   const handleSidebarClick = (component) => {
+    if (component == "requests") {
+      setCurrentComponent(<Requests />);
+      setCurrentComponentName(component);
+    }
     if (component == "discussions") {
       setCurrentComponent(
         <Discussions setCurrentComponent={setCurrentComponent} />
@@ -29,6 +56,42 @@ const Collaboration = () => {
       );
       console.log(currentComponent);
     }
+  };
+  useEffect(() => {
+    onSnapshot(collaborationDocRef, (doc) => {
+      setIsPrivate(doc.data().isPrivate);
+      setIsAdmin(doc.data().uid === user.id);
+    });
+
+    onSnapshot(userQuery, (doc) => {
+      console.log(doc.empty);
+      setIsJoined(!doc.empty);
+    });
+  }, []);
+
+  const handleUserState = () => {
+    if (isJoined) {
+      // leave
+      const q = query(
+        collection(db, "collaborations", uid, "users"),
+        where("userId", "==", user.id)
+      );
+      getDocs(q).then((res) => {
+        deleteDoc(doc(db, "collaborations", uid, "users", res.docs[0].id)).then(
+          () => navigate("/main")
+        );
+      });
+    } else {
+      // request
+      addDoc(collection(db, "collaborations", uid, "requests"), {
+        requestedId: user.id,
+        requestedName: user.name,
+        requestedImage: "",
+      }).then(() => console.log("request sent"));
+    }
+  };
+  const handleColDelete = () => {
+    deleteDoc(doc(db, "collaborations", uid)).then(() => navigate("/main"));
   };
 
   return (
@@ -319,6 +382,32 @@ const Collaboration = () => {
                 </div>
               </li>
 
+              {isAdmin && (
+                <li>
+                  <div
+                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => handleSidebarClick("requests")}
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M8.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l2-2a1 1 0 00-1.414-1.414L11 7.586V3a1 1 0 10-2 0v4.586l-.293-.293z" />
+                      <path d="M3 5a2 2 0 012-2h1a1 1 0 010 2H5v7h2l1 2h4l1-2h2V5h-1a1 1 0 110-2h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5z" />
+                    </svg>
+                    <span className="flex-1 ml-3 whitespace-nowrap">
+                      Requests
+                    </span>
+                    <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                      3
+                    </span>
+                  </div>
+                </li>
+              )}
+
               {/* ---------------------------button--------------------------- */}
               <li>
                 <div
@@ -335,32 +424,50 @@ const Collaboration = () => {
                   </span>
                 </div>
               </li>
+              {/* ---------------------------button--------------------------- */}
 
-              <li>
-                <div
-                  href="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
+              {isPrivate && !isAdmin && (
+                <li>
+                  <div
+                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => handleUserState()}
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="flex-1 ml-3 whitespace-nowrap">Join</span>
-                </div>
-              </li>
+                    <span className="flex-1  whitespace-nowrap">
+                      <button
+                        type="submit"
+                        className="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      >
+                        {isJoined ? "Leave" : "Request"}
+                      </button>
+                    </span>
+                  </div>
+                </li>
+              )}
+              {isAdmin && (
+                <li>
+                  <div
+                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => handleColDelete()}
+                  >
+                    <span className="flex-1  whitespace-nowrap">
+                      <button
+                        type="submit"
+                        className="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      >
+                        Delete
+                      </button>
+                    </span>
+                  </div>
+                </li>
+              )}
             </ul>
           </div>
         </aside>
-        <div className="pt-20 pl-4 sm:ml-64 ">{currentComponent}</div>
+        <div className="pt-20 pl-4 sm:ml-64 ">
+          {isJoined || !isPrivate
+            ? currentComponent
+            : "You must request to join"}
+        </div>
       </div>
     </>
   );

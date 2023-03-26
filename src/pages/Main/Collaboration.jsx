@@ -5,6 +5,7 @@ import {
   doc,
   getDocs,
   onSnapshot,
+  onSnapshotsInSync,
   query,
   where,
 } from "firebase/firestore";
@@ -12,8 +13,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { db } from "../../Config";
 import { SessionService } from "../../SessionService";
+import ConfirmationModal from "../../utils/ConfirmationModal";
 import CreateQuestion from "./CreateQuestion";
 import Discussions from "./Discussions";
+import Materials from "./Materials";
 import Requests from "./Requests";
 
 const Collaboration = () => {
@@ -29,6 +32,8 @@ const Collaboration = () => {
   const collaborationDocRef = doc(db, "collaborations", uid);
   const usersColRef = collection(db, "collaborations", uid, "users");
   const userQuery = query(usersColRef, where("userId", "==", user.id));
+  const [isRequested, setIsRequested] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     setCurrentComponent(
@@ -39,14 +44,16 @@ const Collaboration = () => {
   const handleSidebarClick = (component) => {
     if (component == "requests") {
       setCurrentComponent(<Requests />);
-      setCurrentComponentName(component);
     }
     if (component == "discussions") {
       setCurrentComponent(
         <Discussions setCurrentComponent={setCurrentComponent} />
       );
-      setCurrentComponentName(component);
     }
+    if (component == "materials") {
+      setCurrentComponent(<Materials />);
+    }
+    setCurrentComponentName(component);
   };
 
   const handleSidebarPost = () => {
@@ -67,6 +74,14 @@ const Collaboration = () => {
       console.log(doc.empty);
       setIsJoined(!doc.empty);
     });
+
+    const q = query(
+      collection(db, "collaborations", uid, "requests"),
+      where("requestedId", "==", user.id)
+    );
+    onSnapshot(q, (snapshot) => {
+      setIsRequested(!snapshot.empty);
+    });
   }, []);
 
   const handleUserState = () => {
@@ -83,11 +98,13 @@ const Collaboration = () => {
       });
     } else {
       // request
-      addDoc(collection(db, "collaborations", uid, "requests"), {
-        requestedId: user.id,
-        requestedName: user.name,
-        requestedImage: "",
-      }).then(() => console.log("request sent"));
+      if (!isRequested) {
+        addDoc(collection(db, "collaborations", uid, "requests"), {
+          requestedId: user.id,
+          requestedName: user.name,
+          requestedImage: "",
+        }).then(() => console.log("request sent"));
+      }
     }
   };
   const handleColDelete = () => {
@@ -304,7 +321,6 @@ const Collaboration = () => {
             <ul className="space-y-2 font-medium">
               <li>
                 <div
-                  href="#"
                   className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                   onClick={() => handleSidebarClick("discussions")}
                 >
@@ -323,8 +339,8 @@ const Collaboration = () => {
               </li>
               <li>
                 <div
-                  href="#"
                   className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => handleSidebarClick("materials")}
                 >
                   <svg
                     aria-hidden="true"
@@ -409,21 +425,23 @@ const Collaboration = () => {
               )}
 
               {/* ---------------------------button--------------------------- */}
-              <li>
-                <div
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                  onClick={() => handleSidebarPost()}
-                >
-                  <span className="flex-1  whitespace-nowrap">
-                    <button
-                      type="submit"
-                      className="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    >
-                      Post
-                    </button>
-                  </span>
-                </div>
-              </li>
+              {isJoined && currentComponentName == "discussions" && (
+                <li>
+                  <div
+                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => handleSidebarPost()}
+                  >
+                    <span className="flex-1  whitespace-nowrap">
+                      <button
+                        type="submit"
+                        className="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      >
+                        Post
+                      </button>
+                    </span>
+                  </div>
+                </li>
+              )}
               {/* ---------------------------button--------------------------- */}
 
               {isPrivate && !isAdmin && (
@@ -435,9 +453,17 @@ const Collaboration = () => {
                     <span className="flex-1  whitespace-nowrap">
                       <button
                         type="submit"
-                        className="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                        className={
+                          isRequested
+                            ? "text-white w-full bg-gray-500   font-medium rounded-lg text-sm px-4 py-2  "
+                            : "text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                        }
                       >
-                        {isJoined ? "Leave" : "Request"}
+                        {isJoined
+                          ? "Leave"
+                          : isRequested
+                          ? "Requested"
+                          : "Request"}
                       </button>
                     </span>
                   </div>
@@ -469,6 +495,7 @@ const Collaboration = () => {
             : "You must request to join"}
         </div>
       </div>
+      <ConfirmationModal isOpen={isDeleteModalOpen} />
     </>
   );
 };

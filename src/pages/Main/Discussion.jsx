@@ -92,7 +92,6 @@ const Discussion = ({ discussionId }) => {
     onSnapshot(q, (snapshot) => {
       setAllComments(
         snapshot.docs.map((comment) => {
-          console.log(comment.data());
           return (
             <div key={comment.id}>
               {discussion && (
@@ -227,8 +226,10 @@ const Discussion = ({ discussionId }) => {
   return (
     <>
       <div className="">
-        {discussion && <QuestionCard question={discussion} />}
-        <div>{allComments}</div>
+        <div className="h-100 sm:h-128 overflow-y-scroll">
+          {discussion && <QuestionCard question={discussion} />}
+          <div>{allComments}</div>
+        </div>
         <form className="pr-4" onSubmit={handleFormSubmit}>
           <div className="">
             <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">

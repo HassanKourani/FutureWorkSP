@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getCountFromServer,
   getDocs,
   onSnapshot,
   onSnapshotsInSync,
@@ -14,6 +15,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { db } from "../../Config";
 import { SessionService } from "../../SessionService";
 import ConfirmationModal from "../../utils/ConfirmationModal";
+import Loading from "../../utils/Loading";
 import CreateQuestion from "./CreateQuestion";
 import Discussions from "./Discussions";
 import Materials from "./Materials";
@@ -34,6 +36,7 @@ const Collaboration = () => {
   const userQuery = query(usersColRef, where("userId", "==", user.id));
   const [isRequested, setIsRequested] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [requestsCount, setRequestsCount] = useState("0");
 
   useEffect(() => {
     setCurrentComponent(
@@ -75,13 +78,15 @@ const Collaboration = () => {
       setIsJoined(!doc.empty);
     });
 
-    const q = query(
-      collection(db, "collaborations", uid, "requests"),
-      where("requestedId", "==", user.id)
-    );
+    const requestsColRef = collection(db, "collaborations", uid, "requests");
+    const q = query(requestsColRef, where("requestedId", "==", user.id));
     onSnapshot(q, (snapshot) => {
       setIsRequested(!snapshot.empty);
     });
+
+    getCountFromServer(requestsColRef).then((res) =>
+      setRequestsCount(res.data().count)
+    );
   }, []);
 
   const handleUserState = () => {
@@ -353,9 +358,10 @@ const Collaboration = () => {
                   >
                     <path
                       fillRule="evenodd"
-                      d="M2.25 5.25a3 3 0 013-3h13.5a3 3 0 013 3V15a3 3 0 01-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 01-.53 1.28h-9a.75.75 0 01-.53-1.28l.621-.622a2.25 2.25 0 00.659-1.59V18h-3a3 3 0 01-3-3V5.25zm1.5 0v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5z"
+                      d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H8.25z"
                       clipRule="evenodd"
                     />
+                    <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
                   </svg>
 
                   <span className="flex-1 ml-3 whitespace-nowrap">
@@ -376,10 +382,9 @@ const Collaboration = () => {
                   >
                     <path
                       fillRule="evenodd"
-                      d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H8.25z"
+                      d="M2.25 5.25a3 3 0 013-3h13.5a3 3 0 013 3V15a3 3 0 01-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 01-.53 1.28h-9a.75.75 0 01-.53-1.28l.621-.622a2.25 2.25 0 00.659-1.59V18h-3a3 3 0 01-3-3V5.25zm1.5 0v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5z"
                       clipRule="evenodd"
                     />
-                    <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
                   </svg>
 
                   <span className="flex-1 ml-3 whitespace-nowrap">
@@ -430,30 +435,31 @@ const Collaboration = () => {
                       Requests
                     </span>
                     <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                      3
+                      {requestsCount}
                     </span>
                   </div>
                 </li>
               )}
 
               {/* ---------------------------button--------------------------- */}
-              {isJoined && currentComponentName == "discussions" && (
-                <li>
-                  <div
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                    onClick={() => handleSidebarPost()}
-                  >
-                    <span className="flex-1  whitespace-nowrap">
-                      <button
-                        type="submit"
-                        className="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                      >
-                        Post
-                      </button>
-                    </span>
-                  </div>
-                </li>
-              )}
+              {(isJoined || !isPrivate) &&
+                currentComponentName == "discussions" && (
+                  <li>
+                    <div
+                      className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => handleSidebarPost()}
+                    >
+                      <span className="flex-1  whitespace-nowrap">
+                        <button
+                          type="submit"
+                          className="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                        >
+                          Post
+                        </button>
+                      </span>
+                    </div>
+                  </li>
+                )}
               {/* ---------------------------button--------------------------- */}
 
               {isPrivate && !isAdmin && (
@@ -501,6 +507,7 @@ const Collaboration = () => {
             </ul>
           </div>
         </aside>
+
         <div className="pt-20 pl-4 sm:ml-64 ">
           {isJoined || !isPrivate
             ? currentComponent

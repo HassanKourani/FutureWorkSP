@@ -2,6 +2,7 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../../Config";
+import Loading from "../../utils/Loading";
 import QuestionCard from "../../utils/QuestionCard";
 import Discussion from "./Discussion";
 
@@ -11,6 +12,7 @@ const Discussions = ({ setCurrentComponent }) => {
 
   const discussionColRef = collection(db, "collaborations", uid, "discussions");
   const q = query(discussionColRef, orderBy("createdAt", "desc"));
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleOnClick = (e, discussion) => {
     e.preventDefault();
@@ -18,6 +20,7 @@ const Discussions = ({ setCurrentComponent }) => {
   };
 
   useEffect(() => {
+    setIsLoading(true);
     onSnapshot(q, (snapshot) => {
       setDiscussions(
         snapshot.docs.map((discussion) => (
@@ -28,6 +31,7 @@ const Discussions = ({ setCurrentComponent }) => {
           />
         ))
       );
+      setIsLoading(false);
     });
   }, []);
 
@@ -74,7 +78,11 @@ const Discussions = ({ setCurrentComponent }) => {
           </button>
         </div>
       </form>
-
+      {isLoading && (
+        <div className="flex justify-center">
+          <Loading />
+        </div>
+      )}
       {discussions}
     </>
   );

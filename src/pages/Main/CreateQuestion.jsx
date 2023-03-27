@@ -43,7 +43,9 @@ const CreateQuestion = ({ setCurrentComponent }) => {
           })
             .then(() => {
               setIsLoading(false);
-              setCurrentComponent(<Discussions />);
+              setCurrentComponent(
+                <Discussions setCurrentComponent={setCurrentComponent} />
+              );
             })
             .catch((err) => {
               console.log(err);
@@ -63,7 +65,9 @@ const CreateQuestion = ({ setCurrentComponent }) => {
       })
         .then(() => {
           setIsLoading(false);
-          setCurrentComponent(<Discussions />);
+          setCurrentComponent(
+            <Discussions setCurrentComponent={setCurrentComponent} />
+          );
         })
         .catch((err) => {
           console.log(err);

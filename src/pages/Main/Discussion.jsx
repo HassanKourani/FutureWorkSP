@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db, storage } from "../../Config";
 import { SessionService } from "../../SessionService";
+import Loading from "../../utils/Loading";
 import QuestionCard from "../../utils/QuestionCard";
 
 const Discussion = ({ discussionId }) => {
@@ -89,6 +90,7 @@ const Discussion = ({ discussionId }) => {
   const q = query(commentsColRef, orderBy("createdAt", "desc"));
 
   useEffect(() => {
+    setIsLoading(true);
     onSnapshot(q, (snapshot) => {
       setAllComments(
         snapshot.docs.map((comment) => {
@@ -146,6 +148,7 @@ const Discussion = ({ discussionId }) => {
           );
         })
       );
+      setIsLoading(false);
     });
   }, [discussion]);
 
@@ -225,65 +228,71 @@ const Discussion = ({ discussionId }) => {
 
   return (
     <>
-      <div className="">
-        <div className="h-100 sm:h-128 overflow-y-scroll">
-          {discussion && <QuestionCard question={discussion} />}
-          <div>{allComments}</div>
+      {isLoading ? (
+        <div className="flex justify-center">
+          <Loading />{" "}
         </div>
-        <form className="pr-4" onSubmit={handleFormSubmit}>
-          <div className="">
-            <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-              <div className="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800">
-                <textarea
-                  id="comment"
-                  rows={1}
-                  className="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
-                  placeholder="Write a comment..."
-                  required
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                />
-              </div>
-              <div className="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
-                <button
-                  type="submit"
-                  className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
-                >
-                  {isLoading ? "Loading..." : "Post comment"}
-                </button>
-                <div className="flex pl-0 space-x-1 sm:pl-2">
-                  <label
-                    htmlFor="image"
-                    className="inline-flex items-center justify-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
+      ) : (
+        <div className="">
+          <div className="h-100 sm:h-128 overflow-y-scroll">
+            {discussion && <QuestionCard question={discussion} />}
+            <div>{allComments}</div>
+          </div>
+          <form className="pr-4" onSubmit={handleFormSubmit}>
+            <div className="">
+              <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                <div className="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800">
+                  <textarea
+                    id="comment"
+                    rows={1}
+                    className="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
+                    placeholder="Write a comment..."
+                    required
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                  />
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
+                  <button
+                    type="submit"
+                    className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
                   >
-                    {image ? "attached" : ""}
-                    <svg
-                      aria-hidden="true"
-                      className="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
+                    {isLoading ? "Loading..." : "Post comment"}
+                  </button>
+                  <div className="flex pl-0 space-x-1 sm:pl-2">
+                    <label
+                      htmlFor="image"
+                      className="inline-flex items-center justify-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
-                        clipRule="evenodd"
+                      {image ? "attached" : ""}
+                      <svg
+                        aria-hidden="true"
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <input
+                        type="file"
+                        id="image"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAddImage}
                       />
-                    </svg>
-                    <input
-                      type="file"
-                      id="image"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAddImage}
-                    />
-                  </label>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      )}
     </>
   );
 };

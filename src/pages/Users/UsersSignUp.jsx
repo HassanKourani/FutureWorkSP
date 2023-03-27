@@ -20,32 +20,33 @@ import { SessionService } from "../../SessionService";
 function UsersSignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name , setName] = useState("");
+  const [name, setName] = useState("");
 
-  const emailDocRef = collection(db, "Institutions");
   const navigate = useNavigate();
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-         createUserWithEmailAndPassword(auth, email, password)
-            .then((res) => {
-              setDoc(doc(db, "users", res.user.uid), {
-                email: email,
-                name: name,
-                
-              }).then(() => {
-                SessionService.setUser({
-                  id: res.user.uid,
-                  email: email,
-                  name: name,
-                 
-                });
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((res) => {
+        setDoc(doc(db, "users", res.user.uid), {
+          email: email,
+          name: name,
+          image: "",
+        }).then(() => {
+          SessionService.setUser({
+            id: res.user.uid,
+            email: email,
+            name: name,
+            image: "",
+          });
 
-                navigate(`/main`);
-              });
-            }).catch(error=> {console.log(error)})
-    
+          navigate(`/main`);
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -56,12 +57,6 @@ function UsersSignUp() {
       {/*  Page content */}
       <main className="grow">
         {/*  Page illustration */}
-        <div
-          className="relative max-w-6xl mx-auto h-0 pointer-events-none"
-          aria-hidden="true"
-        >
-          <PageIllustration />
-        </div>
 
         <section className="relative">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -95,7 +90,7 @@ function UsersSignUp() {
                       />
                     </div>
                   </div>
-                  <div className="flex flex-wrap -mx-3 mb-4">
+                  {/* <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label
                         className="block text-gray-300 text-sm font-medium mb-1"
@@ -111,20 +106,20 @@ function UsersSignUp() {
                         required
                       />
                     </div>
-                  </div>
+                  </div> */}
                   <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label
                         className="block text-gray-300 text-sm font-medium mb-1"
                         htmlFor="email"
                       >
-                        Work Email <span className="text-red-600">*</span>
+                        Email <span className="text-red-600">*</span>
                       </label>
                       <input
                         id="email"
                         type="email"
                         className="form-input w-full text-gray-300"
-                        placeholder="you@yourcompany.com"
+                        placeholder="you@edu.uni.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -143,7 +138,7 @@ function UsersSignUp() {
                         id="password"
                         type="password"
                         className="form-input w-full text-gray-300"
-                        placeholder="Password (at least 10 characters)"
+                        placeholder="Password (at least 6 characters)"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required

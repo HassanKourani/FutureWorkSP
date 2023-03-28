@@ -29,7 +29,7 @@ const Main = () => {
               <FancyCard
                 title={collab.data().title}
                 description={collab.data().description}
-                type="Private"
+                type={collab.data().isPrivate ? "Private" : "Public"}
               />
             </div>
           );
@@ -50,7 +50,7 @@ const Main = () => {
         <main className="grow">
           <div className="pt-32 pb-12 md:pt-40 md:pb-20">
             {!pending ? (
-              <div className="grid grid-cols-2 gap-4 mx-10 md:grid-cols-4 lg:grid-cols-6">
+              <div className="grid grid-cols-2 gap-4 mx-10 sm:gird-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 {collaborations}
               </div>
             ) : (

@@ -90,7 +90,6 @@ const Discussion = ({ discussionId }) => {
   const q = query(commentsColRef, orderBy("createdAt", "desc"));
 
   useEffect(() => {
-    setIsLoading(true);
     onSnapshot(q, (snapshot) => {
       setAllComments(
         snapshot.docs.map((comment) => {

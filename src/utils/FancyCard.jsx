@@ -2,7 +2,7 @@ import "./FancyCard.css";
 
 const FancyCard = ({ title, type, description }) => {
   return (
-    <div className="card w-32 h-40 md:w-40 md:h-52 ">
+    <div className="card w-32 h-40 md:w-40 md:h-52 cursor-pointer">
       <div className="content">
         <div className="back">
           <div className="back-content flex justify-center text-center px-2">

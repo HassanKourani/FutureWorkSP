@@ -29,7 +29,7 @@ function UsersSignIn() {
             ...response.data(),
             id: userCredential.user.uid,
           });
-         navigate(`/main`);
+          navigate(`/main`);
         });
       })
       .catch((error) => {
@@ -76,7 +76,7 @@ function UsersSignIn() {
                         id="email"
                         type="email"
                         className="form-input w-full text-gray-300"
-                        placeholder="you@yourcompany.com"
+                        placeholder="you@edu.uni.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -95,7 +95,7 @@ function UsersSignIn() {
                         id="password"
                         type="password"
                         className="form-input w-full text-gray-300"
-                        placeholder="Password (at least 10 characters)"
+                        placeholder="Password (at least 6 characters)"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required

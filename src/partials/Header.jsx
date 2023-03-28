@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Dropdown from "../utils/Dropdown";
+import { SessionService } from "../SessionService";
 
 function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -42,7 +43,12 @@ function Header() {
           {/* Site branding */}
           <div className="shrink-0 mr-4">
             {/* Logo */}
-            <Link to="/" className="block" aria-label="Cruip">
+            <Link
+              to="/"
+              className="block"
+              aria-label="Cruip"
+              onClick={() => SessionService.clearUser()}
+            >
               <svg
                 className="w-8 h-8 fill-current text-purple-600"
                 viewBox="0 0 32 32"

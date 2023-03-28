@@ -14,14 +14,18 @@ const QuestionCard = ({ question, onClick }) => {
             />
             <h1>{question.userName}</h1>
           </div>
-          <div className="flex gap-1 items-center text-gray-400/75 text-xs	">
-            {question && new Date(question.createdAt.seconds * 1000).getDate()}/
-            {question &&
-              new Date(question.createdAt.seconds * 1000).getMonth() + 1}
-            /
-            {question &&
-              new Date(question.createdAt.seconds * 1000).getFullYear()}
-          </div>
+          {question.createdAt && (
+            <div className="flex gap-1 items-center text-gray-400/75 text-xs	">
+              {question &&
+                new Date(question.createdAt.seconds * 1000).getDate()}
+              /
+              {question &&
+                new Date(question.createdAt.seconds * 1000).getMonth() + 1}
+              /
+              {question &&
+                new Date(question.createdAt.seconds * 1000).getFullYear()}
+            </div>
+          )}
         </div>
 
         <div className="pl-8 pt-2 ">

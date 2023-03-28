@@ -1,21 +1,14 @@
 import React from "react";
 
 import Header from "../../partials/Header";
-import PageIllustration from "../../partials/PageIllustration";
 import Banner from "../../partials/Banner";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { auth, db } from "../../Config";
-import {
-  setDoc,
-  doc,
-  query,
-  where,
-  collection,
-  getDocs,
-} from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { SessionService } from "../../SessionService";
+import axios from "axios";
 
 function UsersSignUp() {
   const [email, setEmail] = useState("");
@@ -24,29 +17,49 @@ function UsersSignUp() {
 
   const navigate = useNavigate();
 
+  const options = {
+    method: "POST",
+    url: "https://rapidprod-sendgrid-v1.p.rapidapi.com/mail/send",
+    headers: {
+      "content-type": "application/json",
+      "X-RapidAPI-Key": "6c813d40eemsh4b85bd226d7efc3p13fc54jsn57726975d5dd",
+      "X-RapidAPI-Host": "rapidprod-sendgrid-v1.p.rapidapi.com",
+    },
+    data: `{"personalizations":[{"to":[{"email":"${email}"}],"subject":"OLAA"}],"from":{"email":"noreply@seniorproject-cd393.firebaseapp.com"},"content":[{"type":"text/plain","value":"This is a verif code YAAA!"}]}`,
+  };
+
   const handleFormSubmit = (e) => {
     e.preventDefault();
-
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((res) => {
-        setDoc(doc(db, "users", res.user.uid), {
-          email: email,
-          name: name,
-          image: "",
-        }).then(() => {
-          SessionService.setUser({
-            id: res.user.uid,
-            email: email,
-            name: name,
-            image: "",
-          });
-
-          navigate(`/main`);
-        });
+    axios
+      .request(options)
+      .then(function (response) {
+        console.log(response.data);
+        console.log("email sent");
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(function (error) {
+        console.error(error);
       });
+
+    // createUserWithEmailAndPassword(auth, email, password)
+    //   .then((res) => {
+    //     setDoc(doc(db, "users", res.user.uid), {
+    //       email: email,
+    //       name: name,
+    //       image: "",
+    //     }).then(() => {
+    //       SessionService.setUser({
+    //         id: res.user.uid,
+    //         email: email,
+    //         name: name,
+    //         image: "",
+    //       });
+
+    //       navigate(`/main`);
+    //     });
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   };
 
   return (

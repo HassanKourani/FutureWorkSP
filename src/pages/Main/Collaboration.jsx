@@ -118,7 +118,7 @@ const Collaboration = () => {
   return (
     <>
       <div>
-        <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <nav className="fixed top-0 z-50 w-full bg-gray-900 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <div className="px-3 py-3 lg:px-5 lg:pl-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center justify-start">
@@ -157,7 +157,7 @@ const Collaboration = () => {
           </div>
         </nav>
 
-        <div className="fixed z-50 w-full h-16 max-w-lg -translate-x-1/2 bg-white border border-gray-200 rounded-full bottom-4 left-1/2 dark:bg-gray-700 dark:border-gray-600 sm:hidden">
+        <div className="fixed z-50 w-full h-16 max-w-lg -translate-x-1/2 bg-gray-900 border border-gray-200 rounded-full bottom-4 left-1/2 dark:bg-gray-700 dark:border-gray-600 sm:hidden">
           <div className="grid h-full max-w-lg grid-cols-5 mx-auto">
             <button
               data-tooltip-target="tooltip-home"
@@ -299,14 +299,14 @@ const Collaboration = () => {
 
         <aside
           id="logo-sidebar"
-          className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+          className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-gray-900 border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
           aria-label="Sidebar"
         >
-          <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+          <div className="h-full px-3 pb-4 overflow-y-auto bg-gray-900 dark:bg-gray-800">
             <ul className="space-y-2 font-medium">
               <li>
                 <div
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                  className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700 cursor-pointer"
                   onClick={() => handleSidebarClick("discussions")}
                 >
                   <svg
@@ -327,7 +327,7 @@ const Collaboration = () => {
               </li>
               <li>
                 <div
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                  className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700 cursor-pointer"
                   onClick={() => handleSidebarClick("materials")}
                 >
                   <svg
@@ -344,7 +344,7 @@ const Collaboration = () => {
                     <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
                   </svg>
 
-                  <span className="flex-1 ml-3 whitespace-nowrap">
+                  <span className="flex-1 ml-3 whitespace-nowrap ">
                     Material
                   </span>
                 </div>
@@ -352,7 +352,7 @@ const Collaboration = () => {
               <li>
                 <div
                   href="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                  className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700 cursor-pointer"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -375,7 +375,7 @@ const Collaboration = () => {
               <li>
                 <div
                   href="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                  className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700 cursor-pointer"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -398,7 +398,7 @@ const Collaboration = () => {
               {isAdmin && (
                 <li>
                   <div
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                    className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700 cursor-pointer"
                     onClick={() => handleSidebarClick("requests")}
                   >
                     <svg
@@ -426,7 +426,7 @@ const Collaboration = () => {
                 currentComponentName == "discussions" && (
                   <li>
                     <div
-                      className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700"
                       onClick={() => handleSidebarPost()}
                     >
                       <span className="flex-1  whitespace-nowrap">
@@ -445,7 +445,7 @@ const Collaboration = () => {
               {isPrivate && !isAdmin && (
                 <li>
                   <div
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => handleUserState()}
                   >
                     <span className="flex-1  whitespace-nowrap">
@@ -470,7 +470,7 @@ const Collaboration = () => {
               {isAdmin && (
                 <li>
                   <div
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700"
                     onClick={() => setIsDeleteModalOpen(true)}
                   >
                     <span className="flex-1  whitespace-nowrap">

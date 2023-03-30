@@ -17,6 +17,8 @@ function UsersSignUp() {
   const [isRequested, setIsRequested] = useState(false);
   const [randomNumber, setRandomNumber] = useState("");
   const [code, setCode] = useState("");
+  const [passErr, setPassErr] = useState(false);
+  const [emailErr, setEmailErr] = useState(false);
 
   const navigate = useNavigate();
 
@@ -52,6 +54,8 @@ function UsersSignUp() {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
+    setEmailErr(false);
+    setPassErr(false);
 
     if (code == randomNumber) {
       createUserWithEmailAndPassword(auth, email, password)
@@ -71,8 +75,14 @@ function UsersSignUp() {
             navigate(`/main`);
           });
         })
-        .catch((error) => {
-          console.log(error);
+        .catch((err) => {
+          console.log(err);
+          if (err.code === "auth/weak-password") {
+            setPassErr("At least 6 characters");
+          }
+          if (err.code === "auth/email-already-in-use") {
+            setEmailErr("Email already taken");
+          }
         });
     } else {
       console.log("no no no ");
@@ -131,13 +141,25 @@ function UsersSignUp() {
                       <input
                         id="email"
                         type="email"
-                        className="form-input w-full text-gray-300"
+                        className={
+                          emailErr
+                            ? "form-input w-full text-gray-300 border border-red-600"
+                            : "form-input w-full text-gray-300"
+                        }
                         placeholder="you@edu.uni.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={isRequested}
                         required
                       />
+                      {emailErr && (
+                        <label
+                          className="font-extralight text-red-600 text-xs"
+                          htmlFor="password"
+                        >
+                          {emailErr}
+                        </label>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-4">
@@ -151,12 +173,24 @@ function UsersSignUp() {
                       <input
                         id="password"
                         type="password"
-                        className="form-input w-full text-gray-300"
+                        className={
+                          passErr
+                            ? "form-input w-full text-gray-300 border border-red-600"
+                            : "form-input w-full text-gray-300"
+                        }
                         placeholder="Password (at least 6 characters)"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                       />
+                      {passErr && (
+                        <label
+                          className="font-extralight text-red-600 text-xs"
+                          htmlFor="password"
+                        >
+                          {passErr}
+                        </label>
+                      )}
                     </div>
                   </div>
                   {isRequested && (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import Header from "../../partials/Header";
 import Banner from "../../partials/Banner";
@@ -14,10 +14,20 @@ function UsersSignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [isRequested, setIsRequested] = useState(false);
+  const [randomNumber, setRandomNumber] = useState("");
+  const [code, setCode] = useState("");
 
   const navigate = useNavigate();
 
-  const options = {
+  useEffect(() => {
+    if (!randomNumber)
+      setRandomNumber(
+        Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000
+      );
+  }, []);
+
+  const EmailVerificationOptions = {
     method: "POST",
     url: "https://rapidprod-sendgrid-v1.p.rapidapi.com/mail/send",
     headers: {
@@ -25,41 +35,48 @@ function UsersSignUp() {
       "X-RapidAPI-Key": "6c813d40eemsh4b85bd226d7efc3p13fc54jsn57726975d5dd",
       "X-RapidAPI-Host": "rapidprod-sendgrid-v1.p.rapidapi.com",
     },
-    data: `{"personalizations":[{"to":[{"email":"${email}"}],"subject":"OLAA"}],"from":{"email":"noreply@seniorproject-cd393.firebaseapp.com"},"content":[{"type":"text/plain","value":"This is a verif code YAAA!"}]}`,
+    data: `{"personalizations":[{"to":[{"email":"${email}"}],"subject":"OLAA"}],"from":{"email":"noreply@seniorproject-cd393.firebaseapp.com"},"content":[{"type":"text/plain","value":"bruvv I'm tired. WORKKKK FFS, Take your damn Code:${randomNumber}"}]}`,
+  };
+
+  const handleVerifyEmail = (e) => {
+    e.preventDefault();
+    axios
+      .request(EmailVerificationOptions)
+      .then((response) => {
+        setIsRequested(true);
+      })
+      .catch((error) => {
+        setIsRequested(true);
+      });
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    axios
-      .request(options)
-      .then(function (response) {
-        console.log(response.data);
-        console.log("email sent");
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
 
-    // createUserWithEmailAndPassword(auth, email, password)
-    //   .then((res) => {
-    //     setDoc(doc(db, "users", res.user.uid), {
-    //       email: email,
-    //       name: name,
-    //       image: "",
-    //     }).then(() => {
-    //       SessionService.setUser({
-    //         id: res.user.uid,
-    //         email: email,
-    //         name: name,
-    //         image: "",
-    //       });
+    if (code == randomNumber) {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((res) => {
+          setDoc(doc(db, "users", res.user.uid), {
+            email: email,
+            name: name,
+            image: "",
+          }).then(() => {
+            SessionService.setUser({
+              id: res.user.uid,
+              email: email,
+              name: name,
+              image: "",
+            });
 
-    //       navigate(`/main`);
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
+            navigate(`/main`);
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      console.log("no no no ");
+    }
   };
 
   return (
@@ -103,23 +120,6 @@ function UsersSignUp() {
                       />
                     </div>
                   </div>
-                  {/* <div className="flex flex-wrap -mx-3 mb-4">
-                    <div className="w-full px-3">
-                      <label
-                        className="block text-gray-300 text-sm font-medium mb-1"
-                        htmlFor="company-name"
-                      >
-                        Company Name <span className="text-red-600">*</span>
-                      </label>
-                      <input
-                        id="company-name"
-                        type="text"
-                        className="form-input w-full text-gray-300"
-                        placeholder="Your company or app name"
-                        required
-                      />
-                    </div>
-                  </div> */}
                   <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label
@@ -135,6 +135,7 @@ function UsersSignUp() {
                         placeholder="you@edu.uni.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={isRequested}
                         required
                       />
                     </div>
@@ -158,25 +159,46 @@ function UsersSignUp() {
                       />
                     </div>
                   </div>
-                  {/* <div className="text-sm text-gray-500 text-center">
-                    I agree to be contacted by Open PRO about this offer as per
-                    the Open PRO{" "}
-                    <Link
-                      to="#"
-                      className="underline text-gray-400 hover:text-gray-200 hover:no-underline transition duration-150 ease-in-out"
-                    >
-                      Privacy Policy
-                    </Link>
-                    .
-                  </div> */}
+                  {isRequested && (
+                    <div className="flex flex-wrap -mx-3 mb-4">
+                      <div className="w-full px-3">
+                        <label
+                          className="block text-gray-300 text-sm font-medium mb-1"
+                          htmlFor="password"
+                        >
+                          Verification Code
+                          <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          id="code"
+                          type="text"
+                          className="form-input w-full text-gray-300"
+                          placeholder="Enter 6 digits code"
+                          value={code}
+                          onChange={(e) => setCode(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div className="flex flex-wrap -mx-3 mt-6">
                     <div className="w-full px-3">
-                      <button
-                        className="btn text-white bg-purple-600 hover:bg-purple-700 w-full"
-                        type="submit"
-                      >
-                        Sign up
-                      </button>
+                      {isRequested ? (
+                        <button
+                          className="btn text-white bg-purple-600 hover:bg-purple-700 w-full"
+                          type="submit"
+                        >
+                          Sign up
+                        </button>
+                      ) : (
+                        <button
+                          className="btn text-white bg-purple-600 hover:bg-purple-700 w-full"
+                          type="button"
+                          onClick={(e) => handleVerifyEmail(e)}
+                        >
+                          Verify Email
+                        </button>
+                      )}
                     </div>
                   </div>
                 </form>

@@ -5,7 +5,14 @@ import Banner from "../../partials/Banner";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { auth, db } from "../../Config";
-import { setDoc, doc } from "firebase/firestore";
+import {
+  setDoc,
+  doc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { SessionService } from "../../SessionService";
 import axios from "axios";
@@ -19,6 +26,8 @@ function UsersSignUp() {
   const [code, setCode] = useState("");
   const [passErr, setPassErr] = useState(false);
   const [emailErr, setEmailErr] = useState(false);
+  const [codeErr, setCodeErr] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   const navigate = useNavigate();
 
@@ -40,23 +49,49 @@ function UsersSignUp() {
     data: `{"personalizations":[{"to":[{"email":"${email}"}],"subject":"OLAA"}],"from":{"email":"noreply@seniorproject-cd393.firebaseapp.com"},"content":[{"type":"text/plain","value":"bruvv I'm tired. WORKKKK FFS, Take your damn Code:${randomNumber}"}]}`,
   };
 
+  const emailsQuery = query(
+    collection(db, "users"),
+    where("email", "==", email)
+  );
+
   const handleVerifyEmail = (e) => {
     e.preventDefault();
-    axios
-      .request(EmailVerificationOptions)
-      .then((response) => {
-        setIsRequested(true);
-      })
-      .catch((error) => {
-        setIsRequested(true);
+    setIsPending(true);
+    setEmailErr(false);
+    setPassErr(false);
+    setCodeErr(false);
+    if (password.length >= 6) {
+      getDocs(emailsQuery).then((res) => {
+        console.log(res.empty);
+        if (res.empty) {
+          axios
+            .request(EmailVerificationOptions)
+            .then((response) => {
+              setIsRequested(true);
+              setIsPending(false);
+            })
+            .catch((error) => {
+              setIsRequested(true);
+              setIsPending(false);
+            });
+        } else {
+          setEmailErr("Email already taken");
+          setIsPending(false);
+        }
       });
+    } else {
+      setPassword("");
+      setPassErr("At least 6 characters");
+      setIsPending(false);
+    }
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
     setEmailErr(false);
     setPassErr(false);
-
+    setCodeErr(false);
+    setIsPending(true);
     if (code == randomNumber) {
       createUserWithEmailAndPassword(auth, email, password)
         .then((res) => {
@@ -83,9 +118,12 @@ function UsersSignUp() {
           if (err.code === "auth/email-already-in-use") {
             setEmailErr("Email already taken");
           }
+          setIsPending(false);
         });
     } else {
       console.log("no no no ");
+      setCodeErr(true);
+      setIsPending(false);
     }
   };
 
@@ -206,12 +244,25 @@ function UsersSignUp() {
                         <input
                           id="code"
                           type="text"
-                          className="form-input w-full text-gray-300"
+                          className={
+                            codeErr
+                              ? "form-input w-full text-gray-300 border border-red-600"
+                              : "form-input w-full text-gray-300"
+                          }
                           placeholder="Enter 6 digits code"
                           value={code}
                           onChange={(e) => setCode(e.target.value)}
                           required
                         />
+                        {codeErr && (
+                          <label
+                            className="font-extralight text-red-600 text-xs"
+                            htmlFor="password"
+                          >
+                            Wrong Code!
+                            <span className="text-red-600">*</span>
+                          </label>
+                        )}
                       </div>
                     </div>
                   )}
@@ -222,7 +273,7 @@ function UsersSignUp() {
                           className="btn text-white bg-purple-600 hover:bg-purple-700 w-full"
                           type="submit"
                         >
-                          Sign up
+                          {isPending ? "Loading..." : "Sign up"}
                         </button>
                       ) : (
                         <button
@@ -230,7 +281,7 @@ function UsersSignUp() {
                           type="button"
                           onClick={(e) => handleVerifyEmail(e)}
                         >
-                          Verify Email
+                          {isPending ? "Loading..." : "Verify Email"}
                         </button>
                       )}
                     </div>

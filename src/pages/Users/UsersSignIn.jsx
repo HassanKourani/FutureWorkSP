@@ -15,11 +15,14 @@ import { SessionService } from "../../SessionService";
 function UsersSignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(false);
+  const [isPending, setIsPending] = useState(false);
   const navigate = useNavigate();
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-
+    setError(false);
+    setIsPending(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
@@ -31,9 +34,13 @@ function UsersSignIn() {
           });
           navigate(`/main`);
         });
+        setIsPending(false);
       })
       .catch((error) => {
-        console.log(error);
+        setEmail("");
+        setPassword("");
+        setError(true);
+        setIsPending(false);
       });
   };
   return (
@@ -44,12 +51,6 @@ function UsersSignIn() {
       {/*  Page content */}
       <main className="grow">
         {/*  Page illustration */}
-        <div
-          className="relative max-w-6xl mx-auto h-0 pointer-events-none"
-          aria-hidden="true"
-        >
-          <PageIllustration />
-        </div>
 
         <section className="relative">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -75,7 +76,11 @@ function UsersSignIn() {
                       <input
                         id="email"
                         type="email"
-                        className="form-input w-full text-gray-300"
+                        className={
+                          error
+                            ? "form-input w-full text-gray-300 border border-red-600"
+                            : "form-input w-full text-gray-300"
+                        }
                         placeholder="you@edu.uni.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -94,12 +99,24 @@ function UsersSignIn() {
                       <input
                         id="password"
                         type="password"
-                        className="form-input w-full text-gray-300"
+                        className={
+                          error
+                            ? "form-input w-full text-gray-300 border border-red-600"
+                            : "form-input w-full text-gray-300"
+                        }
                         placeholder="Password (at least 6 characters)"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                       />
+                      {error && (
+                        <label
+                          className="font-extralight text-red-600 text-xs"
+                          htmlFor="password"
+                        >
+                          Wrong Email and/or Password
+                        </label>
+                      )}
                     </div>
                   </div>
 
@@ -109,7 +126,7 @@ function UsersSignIn() {
                         className="btn text-white bg-purple-600 hover:bg-purple-700 w-full"
                         type="submit"
                       >
-                        Sign in
+                        {isPending ? "Loading..." : "Sign in"}
                       </button>
                     </div>
                   </div>

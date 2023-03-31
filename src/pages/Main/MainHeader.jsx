@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Dropdown from "../../utils/Dropdown";
 
-function MainHeader() {
+function MainHeader({ setSearch, search, handleSearch }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const path = window.location.pathname;
 
@@ -58,6 +58,21 @@ function MainHeader() {
             {/* Desktop sign in links */}
             <ul className="flex grow justify-end flex-wrap items-center">
               <li>
+                <input
+                  id="search"
+                  type="text"
+                  autoComplete="off"
+                  className="form-input text-gray-300"
+                  placeholder="Search Collab"
+                  required
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    handleSearch(e);
+                  }}
+                />
+              </li>
+              <li>
                 <Link
                   to="/profile"
                   className="font-medium text-purple-600 hover:text-gray-200 px-4 py-3 flex items-center transition duration-150 ease-in-out"
@@ -77,7 +92,22 @@ function MainHeader() {
           </nav>
 
           {/* Mobile menu */}
-          <div className="md:hidden">
+          <div className="md:hidden flex gap-2">
+            {/* Search beside the hamburger */}
+            <input
+              id="search"
+              type="text"
+              autoComplete="off"
+              className="form-input text-gray-300"
+              placeholder="Search Collab"
+              required
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                handleSearch(e);
+              }}
+            />
+
             {/* Hamburger button */}
             <button
               ref={trigger}
@@ -125,6 +155,29 @@ function MainHeader() {
                   >
                     Create
                   </Link>
+                </li>
+                {/* Search inside the hamburger */}
+                <li className="flex gap-4">
+                  <input
+                    id="search"
+                    type="text"
+                    autoComplete="off"
+                    className="form-input w-3/4 text-gray-300"
+                    placeholder="Search Collab"
+                    required
+                    value={search}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                    }}
+                  />
+                  <button
+                    className="font-medium w-1/4 py-3 border border-transparent  rounded-sm text-white bg-purple-600 hover:bg-purple-700 transition duration-150 ease-in-out"
+                    onClick={(e) => {
+                      handleSearch(e);
+                    }}
+                  >
+                    Search
+                  </button>
                 </li>
               </ul>
             </nav>

@@ -13,6 +13,8 @@ const Main = () => {
   const user = SessionService.getUser();
   const domain = user.email.split("@")[1];
   const [collaborations, setCollaborations] = useState();
+  const [searchedCollabs, setSearchedCollabs] = useState();
+  const [search, setSearch] = useState("");
   const [pending, setPending] = useState(true);
   const navigate = useNavigate();
   const q = query(
@@ -24,34 +26,68 @@ const Main = () => {
     onSnapshot(q, (snapshot) => {
       setCollaborations(
         snapshot.docs.map((collab) => {
-          return (
-            <div key={collab.id} onClick={() => navigate(`/main/${collab.id}`)}>
-              <FancyCard
-                title={collab.data().title}
-                description={collab.data().description}
-                type={collab.data().isPrivate ? "Private" : "Public"}
-              />
-            </div>
-          );
+          return collab;
         })
       );
       setPending(false);
     });
   }, []);
 
+  useEffect(() => {
+    setSearchedCollabs(collaborations);
+  }, [collaborations]);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (search.length > 1) {
+      setSearchedCollabs(
+        collaborations.filter((collab) => {
+          console.log(collab);
+          return collab
+            .data()
+            .title.toLowerCase()
+            .includes(search.toLowerCase());
+        })
+      );
+    } else {
+      setSearchedCollabs(collaborations);
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col min-h-screen overflow-hidden">
         {/*  Site header */}
-        <MainHeader />
+        <MainHeader
+          setSearch={setSearch}
+          search={search}
+          handleSearch={handleSearch}
+        />
         {/* <Loading /> */}
         {/*  Page content */}
 
-        <main className="grow">
-          <div className="pt-32 pb-12 md:pt-40 md:pb-20">
+        <main className="grow flex justify-center">
+          <div className="pt-32 pb-12 md:pt-40 md:pb-20 sm:w-3/4">
             {!pending ? (
-              <div className="grid grid-cols-2 gap-4 mx-10 sm:gird-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                {collaborations}
+              <div className="grid grid-cols-2 gap-4 mx-10 sm:gird-cols-3 md:grid-cols-3 lg:grid-cols-4">
+                {searchedCollabs &&
+                  searchedCollabs.map((collab) => (
+                    <div
+                      key={collab.id}
+                      onClick={() =>
+                        navigate(`/main/${collab.id}`, {
+                          state: {
+                            collabName: collab.data().title,
+                          },
+                        })
+                      }
+                    >
+                      <FancyCard
+                        title={collab.data().title}
+                        description={collab.data().description}
+                        type={collab.data().isPrivate ? "Private" : "Public"}
+                      />
+                    </div>
+                  ))}
               </div>
             ) : (
               <div className="flex justify-center items-center mt-20 ">

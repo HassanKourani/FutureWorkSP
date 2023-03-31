@@ -38,9 +38,6 @@ const Discussions = ({ setCurrentComponent }) => {
       setIsLoading(false);
     });
   }, []);
-  useEffect(() => {
-    console.log(discussions);
-  }, [discussions]);
 
   useEffect(() => {
     setSearchedDiscussions(discussions);

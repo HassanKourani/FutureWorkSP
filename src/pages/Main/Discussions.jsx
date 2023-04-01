@@ -18,7 +18,12 @@ const Discussions = ({ setCurrentComponent }) => {
 
   const handleOnClick = (e, discussion) => {
     e.preventDefault();
-    setCurrentComponent(<Discussion discussionId={discussion.id} />);
+    setCurrentComponent(
+      <Discussion
+        discussionId={discussion.id}
+        setCurrentComponent={setCurrentComponent}
+      />
+    );
   };
   //  <QuestionCard
   //    question={discussion.data()}

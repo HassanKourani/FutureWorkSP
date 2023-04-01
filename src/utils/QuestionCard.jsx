@@ -1,4 +1,28 @@
-const QuestionCard = ({ question, onClick }) => {
+import { useState } from "react";
+import ConfirmationModal from "./ConfirmationModal";
+import { deleteDoc, doc } from "firebase/firestore";
+import { useParams } from "react-router-dom";
+import Discussions from "../pages/Main/Discussions";
+import { db } from "../Config";
+import { SessionService } from "../SessionService";
+
+const QuestionCard = ({ question, onClick, setCurrentComponent }) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const uid = useParams().uid;
+  const user = SessionService.getUser();
+  //console.log(user.id, question.userId);
+  const handleConfirmDeleteModal = (e) => {
+    e.preventDefault();
+
+    deleteDoc(doc(db, "collaborations", uid, "discussions", question.id)).then(
+      () => {
+        setCurrentComponent(
+          <Discussions setCurrentComponent={setCurrentComponent} />
+        );
+      }
+    );
+  };
   return (
     <>
       <div
@@ -14,18 +38,43 @@ const QuestionCard = ({ question, onClick }) => {
             />
             <h1>{question.userName}</h1>
           </div>
-          {question.createdAt && (
-            <div className="flex gap-1 items-center text-gray-400/75 text-xs	">
-              {question &&
-                new Date(question.createdAt.seconds * 1000).getDate()}
-              /
-              {question &&
-                new Date(question.createdAt.seconds * 1000).getMonth() + 1}
-              /
-              {question &&
-                new Date(question.createdAt.seconds * 1000).getFullYear()}
-            </div>
-          )}
+          <div className="flex gap-4">
+            {question.createdAt && (
+              <div className="flex gap-1 items-center text-gray-400/75 text-xs	">
+                {question &&
+                  new Date(question.createdAt.seconds * 1000).getDate()}
+                /
+                {question &&
+                  new Date(question.createdAt.seconds * 1000).getMonth() + 1}
+                /
+                {question &&
+                  new Date(question.createdAt.seconds * 1000).getFullYear()}
+              </div>
+            )}
+            {user.id === question.userId && (
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDeleteModalOpen(true);
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6 hover:text-red-500"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="pl-8 pt-2 ">
@@ -79,6 +128,11 @@ const QuestionCard = ({ question, onClick }) => {
           </div>
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        setIsOpen={setIsDeleteModalOpen}
+        onClick={(e) => handleConfirmDeleteModal(e)}
+      />
     </>
   );
 };

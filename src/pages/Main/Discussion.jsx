@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   onSnapshot,
   orderBy,
@@ -16,7 +17,7 @@ import { SessionService } from "../../SessionService";
 import Loading from "../../utils/Loading";
 import QuestionCard from "../../utils/QuestionCard";
 
-const Discussion = ({ discussionId }) => {
+const Discussion = ({ discussionId, setCurrentComponent }) => {
   const [comment, setComment] = useState();
   const [image, setImage] = useState("");
   const user = SessionService.getUser();
@@ -89,6 +90,23 @@ const Discussion = ({ discussionId }) => {
   );
   const q = query(commentsColRef, orderBy("createdAt", "desc"));
 
+  const handleDeleteComment = (e, commentId) => {
+    e.preventDefault();
+    deleteDoc(
+      doc(
+        db,
+        "collaborations",
+        uid,
+        "discussions",
+        discussionId,
+        "comments",
+        commentId
+      )
+    ).then(() => {
+      console.log("deleted");
+    });
+  };
+
   useEffect(() => {
     onSnapshot(q, (snapshot) => {
       setAllComments(
@@ -112,27 +130,49 @@ const Discussion = ({ discussionId }) => {
                       />
                       <h1>{comment.data().userName}</h1>
                     </div>
-                    {comment.data().isAnswer && user.id == discussion.userId ? (
-                      <button
-                        className="bg-red-500 px-4 py-2"
-                        onClick={(e) => handleRemoveAnswer(e, comment.id)}
-                      >
-                        Remove
-                      </button>
-                    ) : (
-                      ""
-                    )}
-                    {user.id == discussion.userId && !discussion.isAnswered ? (
-                      <button
-                        className="bg-emerald-500 px-4 py-2"
-                        onClick={(e) => handleChooseAnswer(e, comment.id)}
-                      >
-                        Choose
-                      </button>
-                    ) : (
-                      <></>
-                    )}
+                    <div className="flex gap-4 items-center">
+                      {comment.data().isAnswer &&
+                      user.id == discussion.userId ? (
+                        <button
+                          className="bg-red-500 px-4 py-2"
+                          onClick={(e) => handleRemoveAnswer(e, comment.id)}
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        ""
+                      )}
+                      {user.id == discussion.userId &&
+                      !discussion.isAnswered ? (
+                        <button
+                          className="bg-emerald-500 px-4 py-2"
+                          onClick={(e) => handleChooseAnswer(e, comment.id)}
+                        >
+                          Choose
+                        </button>
+                      ) : (
+                        <></>
+                      )}
+                      {user.id === comment.data().userId && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6 hover:text-red-500 cursor-pointer"
+                          onClick={(e) => handleDeleteComment(e, comment.id)}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      )}
+                    </div>
                   </div>
+
                   <div className="pl-8 pt-2">
                     <p className="mt-1">{comment.data().comment}</p>
                     {comment.data().image ? (
@@ -234,7 +274,12 @@ const Discussion = ({ discussionId }) => {
       ) : (
         <div className="">
           <div className="h-100 sm:h-128 overflow-y-scroll">
-            {discussion && <QuestionCard question={discussion} />}
+            {discussion && (
+              <QuestionCard
+                question={discussion}
+                setCurrentComponent={setCurrentComponent}
+              />
+            )}
             <div>{allComments}</div>
           </div>
           <form className="pr-4" onSubmit={handleFormSubmit}>

@@ -19,6 +19,7 @@ import CreateQuestion from "./CreateQuestion";
 import Discussions from "./Discussions";
 import Materials from "./Materials";
 import Requests from "./Requests";
+import PostMaterial from "./PostMaterial";
 
 const Collaboration = () => {
   const [currentComponent, setCurrentComponent] = useState();
@@ -65,7 +66,9 @@ const Collaboration = () => {
       setCurrentComponent(
         <CreateQuestion setCurrentComponent={setCurrentComponent} />
       );
-      console.log(currentComponent);
+    }
+    if (currentComponentName == "materials") {
+      setCurrentComponent(<PostMaterial />);
     }
   };
   useEffect(() => {
@@ -425,7 +428,8 @@ const Collaboration = () => {
 
               {/* ---------------------------button--------------------------- */}
               {(isJoined || !isPrivate) &&
-                currentComponentName == "discussions" && (
+                (currentComponentName == "discussions" ||
+                  currentComponentName == "materials") && (
                   <li>
                     <div
                       className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700"

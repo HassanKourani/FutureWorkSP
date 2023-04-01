@@ -81,11 +81,7 @@ const Main = () => {
                         })
                       }
                     >
-                      <FancyCard
-                        title={collab.data().title}
-                        description={collab.data().description}
-                        type={collab.data().isPrivate ? "Private" : "Public"}
-                      />
+                      <FancyCard collab={{ ...collab.data(), id: collab.id }} />
                     </div>
                   ))}
               </div>

@@ -13,6 +13,7 @@ import Main from "./pages/Main/Main";
 import CreateCollab from "./pages/Main/CreateCollab";
 import Collaboration from "./pages/Main/Collaboration";
 import CreateQuestion from "./pages/Main/CreateQuestion";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
   const location = useLocation();
@@ -41,7 +42,7 @@ function App() {
         <Route path="/main" element={<Main />} />
         <Route path="/createCollab" element={<CreateCollab />} />
         <Route path="/main/:uid" element={<Collaboration />} />
-        {/* <Route path="/profile" element={<Profile />} /> */}
+        <Route path="/profile" element={<Profile />} />
 
         {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
       </Routes>

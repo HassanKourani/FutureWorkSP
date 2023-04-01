@@ -20,6 +20,7 @@ import Discussions from "./Discussions";
 import Materials from "./Materials";
 import Requests from "./Requests";
 import PostMaterial from "./PostMaterial";
+import Meetings from "../Meetings/Meetings";
 
 const Collaboration = () => {
   const [currentComponent, setCurrentComponent] = useState();
@@ -57,6 +58,9 @@ const Collaboration = () => {
     }
     if (component == "materials") {
       setCurrentComponent(<Materials />);
+    }
+    if (component == "meetings") {
+      setCurrentComponent(<Meetings />);
     }
     setCurrentComponentName(component);
   };
@@ -358,6 +362,7 @@ const Collaboration = () => {
                 <div
                   href="#"
                   className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700 cursor-pointer"
+                  onClick={() => handleSidebarClick("meetings")}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

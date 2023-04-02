@@ -1,11 +1,11 @@
 .app {
     font-family: sans-serif;
     margin-top: 1rem;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid #ABABFF;
 }
 
 .item {
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #ABABFF;
 }
 
 .itemBtn {
@@ -17,17 +17,17 @@
     padding: 1rem;
     font-size: 1rem;
     text-align: left;
-    color: #007bff;
+    color: #ffffff;
     background-color: transparent;
     border: none;
 }
 
 .itemBtn:hover {
-    background-color: #f3f3f3;
+    background-color: #262668;
 }
 
 .itemBtnExpanded {
-    background-color: #e7e7e7;
+    background-color: #262668;
 }
 
 .itemContent {

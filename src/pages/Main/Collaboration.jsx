@@ -21,6 +21,7 @@ import Materials from "./Materials";
 import Requests from "./Requests";
 import PostMaterial from "./PostMaterial";
 import Meetings from "../Meetings/Meetings";
+import Details from "./Details";
 
 const Collaboration = () => {
   const [currentComponent, setCurrentComponent] = useState();
@@ -61,6 +62,9 @@ const Collaboration = () => {
     }
     if (component == "meetings") {
       setCurrentComponent(<Meetings />);
+    }
+    if (component == "details") {
+      setCurrentComponent(<Details />);
     }
     setCurrentComponentName(component);
   };
@@ -174,7 +178,7 @@ const Collaboration = () => {
               className="inline-flex flex-col items-center justify-center px-5 rounded-l-full hover:bg-gray-50 dark:hover:bg-gray-800 group"
             >
               <svg
-                className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500"
+                className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-500"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -198,7 +202,7 @@ const Collaboration = () => {
               className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
             >
               <svg
-                className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500"
+                className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-500"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -225,7 +229,7 @@ const Collaboration = () => {
               <button
                 data-tooltip-target="tooltip-new"
                 type="button"
-                className="inline-flex items-center justify-center w-10 h-10 font-medium bg-blue-600 rounded-full hover:bg-blue-700 group focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800"
+                className="inline-flex items-center justify-center w-10 h-10 font-medium bg-purple-600 rounded-full hover:bg-purple-700 group focus:ring-4 focus:ring-purple-300 focus:outline-none dark:focus:ring-purple-800"
               >
                 <svg
                   className="w-6 h-6 text-white"
@@ -257,7 +261,7 @@ const Collaboration = () => {
               className="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
             >
               <svg
-                className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500"
+                className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-500"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -281,7 +285,7 @@ const Collaboration = () => {
               className="inline-flex flex-col items-center justify-center px-5 rounded-r-full hover:bg-gray-50 dark:hover:bg-gray-800 group"
             >
               <svg
-                className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500"
+                className="w-6 h-6 mb-1 text-gray-500 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-500"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -384,8 +388,8 @@ const Collaboration = () => {
               </li>
               <li>
                 <div
-                  href="#"
                   className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700 cursor-pointer"
+                  onClick={() => handleSidebarClick("details")}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -424,7 +428,7 @@ const Collaboration = () => {
                     <span className="flex-1 ml-3 whitespace-nowrap">
                       Requests
                     </span>
-                    <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                    <span className="inline-flex items-center justify-center w-3 h-3 p-3 ml-3 text-sm font-medium text-purple-800 bg-purple-100 rounded-full dark:bg-purple-900 dark:text-purple-300">
                       {requestsCount}
                     </span>
                   </div>
@@ -443,7 +447,7 @@ const Collaboration = () => {
                       <span className="flex-1  whitespace-nowrap">
                         <button
                           type="submit"
-                          className="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                          className="text-white w-full bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800"
                         >
                           Post
                         </button>
@@ -465,7 +469,7 @@ const Collaboration = () => {
                         className={
                           isRequested
                             ? "text-white w-full bg-gray-500   font-medium rounded-lg text-sm px-4 py-2  "
-                            : "text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            : "text-white w-full bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800"
                         }
                       >
                         {isJoined
@@ -487,7 +491,7 @@ const Collaboration = () => {
                     <span className="flex-1  whitespace-nowrap">
                       <button
                         type="submit"
-                        className="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                        className="text-white w-full bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800"
                       >
                         Delete
                       </button>

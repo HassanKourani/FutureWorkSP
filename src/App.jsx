@@ -12,7 +12,6 @@ import UsersSignUp from "./pages/Users/UsersSignUp";
 import Main from "./pages/Main/Main";
 import CreateCollab from "./pages/Main/CreateCollab";
 import Collaboration from "./pages/Main/Collaboration";
-import CreateQuestion from "./pages/Main/CreateQuestion";
 import Profile from "./pages/Profile/Profile";
 
 function App() {

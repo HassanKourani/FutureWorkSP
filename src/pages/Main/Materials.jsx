@@ -39,7 +39,8 @@ const Materials = () => {
       ) : (
         <div className="pr-4"></div>
       )}
-      <div className="app">
+
+      <div className="app pr-4">
         <Accordion transition transitionTimeout={1000}>
           {folders}
         </Accordion>

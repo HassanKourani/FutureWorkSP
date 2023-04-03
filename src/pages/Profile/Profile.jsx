@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
+import EditInput from "../../utils/EditInput";
+import Tabs from "../../utils/Tabs";
 
 const Profile = () => {
   return (
     <>
-      <header className="absolute w-full z-30">
+      <header className="absolute top-0 w-full z-30">
         <div className="max-w-6xl mx-auto px-2 sm:px-6">
           <div className="flex items-center justify-between h-20">
             <Link to="/main" className="block">
@@ -19,11 +21,16 @@ const Profile = () => {
         </div>
       </header>
 
-      <div
-        id="profile"
-        className="fixed top-20 left-20 z-40 w-96 h-screen pt-20 bg-gray-900 border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
-      >
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-gray-900 dark:bg-gray-800"></div>
+      <div className="mt-20 h-[34rem] p-4 flex gap-4 flex-col sm:flex-row ">
+        <div className="h-full bg-gray-700/25 w-full flex flex-col items-center justify-between p-8 sm:w-1/2 md:w-1/3 lg:w-1/4">
+          <div className="w-32 h-32 rounded-full bg-blue-500  "></div>
+          <EditInput />
+          <EditInput />
+          <button className="bg-purple-600 p-2 w-52 rounded-md">Logout</button>
+        </div>
+        <div className="h-full bg-gray-700/25 w-full p-4 flex justify-center sm:w-1/2 md:w-2/3 lg:w-3/4">
+          <Tabs />
+        </div>
       </div>
     </>
   );

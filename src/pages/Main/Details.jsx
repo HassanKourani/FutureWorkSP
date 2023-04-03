@@ -27,17 +27,23 @@ const Details = () => {
 
   useEffect(() => {
     usersId &&
-      setUsers(
+      Promise.all(
         usersId.map((id) =>
           getDoc(doc(db, "users", id)).then((user) => {
-            return (
-              <li key={user.id}>
-                <div> {user.data().name}</div>
-              </li>
-            );
+            return { ...user.data(), id: user.id };
           })
         )
-      );
+      ).then((usersList) => {
+        setUsers(
+          usersList.map((element) => {
+            return (
+              <div key={element.id}>
+                <li>{element.name}</li>
+              </div>
+            );
+          })
+        );
+      });
   }, [usersId]);
   return (
     <>
@@ -50,7 +56,7 @@ const Details = () => {
       <div>
         <label>Users</label>
       </div>
-      {/* {users && <ul>{users}</ul>} */}
+      {users && <ul>{users}</ul>}
     </>
   );
 };

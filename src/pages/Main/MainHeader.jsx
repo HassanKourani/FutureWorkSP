@@ -1,10 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Dropdown from "../../utils/Dropdown";
 
 function MainHeader({ setSearch, search, handleSearch }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const path = window.location.pathname;
+  const navigate = useNavigate();
+  const onProfileClick = () => {
+    navigate(`/profile`, {
+      state: {},
+    });
+  };
 
   const trigger = useRef(null);
   const mobileNav = useRef(null);

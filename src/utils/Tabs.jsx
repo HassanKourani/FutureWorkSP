@@ -6,11 +6,11 @@ const Tabs = () => {
       <div className="radio-inputs">
         <label className="radio">
           <input type="radio" name="radio" defaultChecked="" />
-          <span className="name">HTML</span>
+          <span className="name">Discussions</span>
         </label>
         <label className="radio">
           <input type="radio" name="radio" />
-          <span className="name">React</span>
+          <span className="name">Material</span>
         </label>
         {/* <label className="radio">
           <input type="radio" name="radio" />

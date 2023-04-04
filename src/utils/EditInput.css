@@ -1,5 +1,5 @@
 .containerInput {
-    background-color: #000;
+    background-color: #33363A;
     position: relative;
     overflow: hidden;
     margin: 0;
@@ -17,7 +17,7 @@
     margin: auto;
     animation: rotate6234 2.5s ease-in-out infinite;
     z-index: -1;
-    background-image: conic-gradient(from 0deg at 50% 50%, #073AFF00 0%, #FF0000FF 25%, #073AFF00 25%);
+    background-image: conic-gradient(from 0deg at 50% 50%, #073AFF00 0%, #8D8DFF 25%, #073AFF00 25%);
 }
 
 .containerInput>input {
@@ -27,7 +27,7 @@
     color: #fff;
     border: none;
     padding: 12px;
-    background-color: #0a0a0a;
+    background-color: #33363A;
     outline: 5px solid #0a0a0a;
 }
 
@@ -40,7 +40,7 @@
 }
 
 .containerInput>input:not(:placeholder-shown):valid {
-    outline: 4px solid rgb(0, 255, 183);
+    outline: 4px solid #8D8DFF;
     border-radius: 0;
 }
 

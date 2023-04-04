@@ -1,10 +1,10 @@
 import { collection, getDocs } from "@firebase/firestore";
 import { Accordion, AccordionItem as Item } from "@szhsin/react-accordion";
-import { db } from "../Config";
-import { useParams } from "react-router";
+import { db } from "../../Config";
 import { useEffect, useState } from "react";
-import styles from "./AccordionFolder.module.css";
-import chevronDown from "./Chevron-down.svg";
+import styles from "../../utils/AccordionFolder.module.css";
+import chevronDown from "../../utils/Chevron-down.svg";
+import { SessionService } from "../../SessionService";
 
 const AccordionItem = ({ header, ...rest }) => (
   <Item
@@ -25,13 +25,13 @@ const AccordionItem = ({ header, ...rest }) => (
   />
 );
 
-const AccordionFolder = ({ folder }) => {
-  const uid = useParams().uid;
+const ProfileAccordionFolder = ({ folder }) => {
   const [materials, setMaterials] = useState([]);
+  const user = SessionService.getUser();
 
   useEffect(() => {
     getDocs(
-      collection(db, "collaborations", uid, "folders", folder.id, "materials")
+      collection(db, "users", user.id, "folders", folder.id, "materials")
     ).then((docs) =>
       setMaterials(
         docs.docs.map((material) => (
@@ -73,4 +73,4 @@ const AccordionFolder = ({ folder }) => {
   );
 };
 
-export default AccordionFolder;
+export default ProfileAccordionFolder;

@@ -1,21 +1,21 @@
 import "./Tabs.css";
 
-const Tabs = () => {
+const Tabs = ({ handleTabSelect }) => {
   return (
     <>
       <div className="radio-inputs">
-        <label className="radio">
-          <input type="radio" name="radio" defaultChecked="" />
+        <label className="radio" onClick={() => handleTabSelect("discussions")}>
+          <input type="radio" name="radio" defaultChecked />
           <span className="name">Discussions</span>
         </label>
-        <label className="radio">
+        <label className="radio" onClick={() => handleTabSelect("materials")}>
           <input type="radio" name="radio" />
-          <span className="name">Material</span>
+          <span className="name">Materials</span>
         </label>
-        {/* <label className="radio">
+        <label className="radio" onClick={() => handleTabSelect("settings")}>
           <input type="radio" name="radio" />
-          <span className="name">Vue</span>
-        </label> */}
+          <span className="name">Settings</span>
+        </label>
       </div>
     </>
   );

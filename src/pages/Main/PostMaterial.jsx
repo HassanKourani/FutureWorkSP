@@ -8,9 +8,10 @@ import { SessionService } from "../../SessionService";
 const PostMaterial = () => {
   const [title, setTitle] = useState("");
   const [files, setFiles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const uid = useParams().uid;
   const user = SessionService.getUser();
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -41,44 +42,70 @@ const PostMaterial = () => {
       addDoc(collection(db, "collaborations", uid, "folders"), {
         folderName: title,
       }).then((res) => {
-        console.log(res.id);
-        let i = 1;
-        Array.from(files).map((file) => {
-          const fileRef = ref(storage, file.name);
-          uploadBytes(fileRef, file).then(() => {
-            getDownloadURL(fileRef).then((url) => {
-              addDoc(
-                collection(
-                  db,
-                  "collaborations",
-                  uid,
-                  "folders",
-                  res.id,
-                  "materials"
-                ),
-                {
-                  name: file.name,
-                  type: "",
-                  link: url,
-                  userId: user.id,
-                  createdAt: serverTimestamp(),
-                }
-              )
-                .then(() => {
-                  console.log("i was here");
-                  if (i === files.length) setIsLoading(false);
-                  i++;
-                })
-                .catch((err) => {
+        addDoc(collection(db, "users", user.id, "folders"), {
+          folderName: title,
+        }).then((userRes) => {
+          console.log(res.id);
+          let i = 1;
+          Array.from(files).map((file) => {
+            const fileRef = ref(storage, file.name);
+            uploadBytes(fileRef, file).then(() => {
+              getDownloadURL(fileRef).then((url) => {
+                console.log(url);
+
+                addDoc(
+                  collection(
+                    db,
+                    "users",
+                    user.id,
+                    "folders",
+                    userRes.id,
+                    "materials"
+                  ),
+                  {
+                    name: file.name,
+                    type: "",
+                    link: url,
+                    userId: user.id,
+                    createdAt: serverTimestamp(),
+                  }
+                ).catch((err) => {
                   console.log(err);
-                  setIsLoading(false);
                 });
+
+                addDoc(
+                  collection(
+                    db,
+                    "collaborations",
+                    uid,
+                    "folders",
+                    res.id,
+                    "materials"
+                  ),
+                  {
+                    name: file.name,
+                    type: "",
+                    link: url,
+                    userId: user.id,
+                    createdAt: serverTimestamp(),
+                  }
+                )
+                  .then(() => {
+                    console.log("i was here");
+                    if (i === files.length) setIsLoading(false);
+                    i++;
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    setIsLoading(false);
+                  });
+              });
             });
           });
         });
       });
     } else {
-      console.log("upload something shitface");
+      console.log("upload something please  <3 ");
     }
   };
 

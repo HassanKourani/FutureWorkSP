@@ -1,23 +1,26 @@
 import { Link, useNavigate } from "react-router-dom";
 import EditInput from "../../utils/EditInput";
 import Tabs from "../../utils/Tabs";
-import Discussions from "../Main/Discussions";
-import { useEffect, useState } from "react";
-import Materials from "../Main/Materials";
-import ProfileDiscussions from "./ProfileDiscussions";
+import { Fragment, useEffect, useState } from "react";
 import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../Config";
 import { SessionService } from "../../SessionService";
 import Loading from "../../utils/Loading";
+import ProfileAccordionFolder from "./ProfileAccordionFolder";
+import { Accordion } from "@szhsin/react-accordion";
+import Settings from "./Settings";
 
 const Profile = () => {
   const [allDiscs, setAllDiscs] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedTab, setSelectedTab] = useState();
+  const [folders, setFolders] = useState();
 
   const user = SessionService.getUser();
   const navigate = useNavigate();
 
   const discColRef = collection(db, "users", user.id, "discussions");
+  const foldersColRef = collection(db, "users", user.id, "folders");
 
   const handleGoToDisc = (e, collabId, discId) => {
     getDoc(doc(db, "collaborations", collabId)).then((collab) => {
@@ -28,6 +31,12 @@ const Profile = () => {
         },
       });
     });
+  };
+
+  const handleTabSelect = (selected) => {
+    if (selected === "discussions") setSelectedTab(allDiscs);
+    else if (selected === "materials") setSelectedTab(folders);
+    else if (selected === "settings") setSelectedTab("settings");
   };
 
   useEffect(() => {
@@ -65,10 +74,24 @@ const Profile = () => {
         setIsLoading(false);
       });
     });
+    onSnapshot(foldersColRef, (snapshot) => {
+      setFolders(
+        snapshot.docs.map((folder) => {
+          console.log(folder.id);
+          return (
+            <Fragment key={folder.id}>
+              <ProfileAccordionFolder
+                folder={{ ...folder.data(), id: folder.id }}
+              />
+            </Fragment>
+          );
+        })
+      );
+    });
   }, []);
 
   useEffect(() => {
-    console.log(allDiscs);
+    allDiscs && setSelectedTab(allDiscs);
   }, [allDiscs]);
 
   return (
@@ -115,8 +138,22 @@ const Profile = () => {
           <button className="bg-purple-600 p-2 w-52 rounded-md">Logout</button>
         </div>
         <div className="h-full bg-gray-700/25 w-full p-4 flex flex-col items-center sm:w-1/2 md:w-2/3 lg:w-3/4">
-          <Tabs />
-          {isLoading ? <Loading /> : allDiscs}
+          <Tabs selectedTab={selectedTab} handleTabSelect={handleTabSelect} />
+
+          {selectedTab === folders ? (
+            <div className="app pr-4">
+              <Accordion transition transitionTimeout={1000}>
+                {folders && folders}
+              </Accordion>
+            </div>
+          ) : selectedTab === allDiscs ? (
+            <div className="app pr-4">{allDiscs && allDiscs}</div>
+          ) : selectedTab === "settings" ? (
+            <Settings />
+          ) : (
+            <></>
+          )}
+          {isLoading && <Loading />}
         </div>
       </div>
     </>

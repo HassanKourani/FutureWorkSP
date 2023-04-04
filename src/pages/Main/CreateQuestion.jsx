@@ -46,6 +46,13 @@ const CreateQuestion = ({ setCurrentComponent }) => {
               setCurrentComponent(
                 <Discussions setCurrentComponent={setCurrentComponent} />
               );
+              addDoc(collection(db, "users", user.id, "discussions"), {
+                collabId: uid,
+                discId: res.id,
+              }).catch((err) => {
+                console.log(err);
+                setIsLoading(false);
+              });
             })
             .catch((err) => {
               console.log(err);
@@ -63,11 +70,18 @@ const CreateQuestion = ({ setCurrentComponent }) => {
         isAnswered: false,
         createdAt: serverTimestamp(),
       })
-        .then(() => {
+        .then((res) => {
           setIsLoading(false);
           setCurrentComponent(
             <Discussions setCurrentComponent={setCurrentComponent} />
           );
+          addDoc(collection(db, "users", user.id, "discussions"), {
+            collabId: uid,
+            discId: res.id,
+          }).catch((err) => {
+            console.log(err);
+            setIsLoading(false);
+          });
         })
         .catch((err) => {
           console.log(err);

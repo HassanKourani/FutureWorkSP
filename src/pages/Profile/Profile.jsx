@@ -1,13 +1,81 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import EditInput from "../../utils/EditInput";
 import Tabs from "../../utils/Tabs";
+import Discussions from "../Main/Discussions";
+import { useEffect, useState } from "react";
+import Materials from "../Main/Materials";
+import ProfileDiscussions from "./ProfileDiscussions";
+import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
+import { db } from "../../Config";
+import { SessionService } from "../../SessionService";
+import Loading from "../../utils/Loading";
 
 const Profile = () => {
+  const [allDiscs, setAllDiscs] = useState();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const user = SessionService.getUser();
+  const navigate = useNavigate();
+
+  const discColRef = collection(db, "users", user.id, "discussions");
+
+  const handleGoToDisc = (e, collabId, discId) => {
+    getDoc(doc(db, "collaborations", collabId)).then((collab) => {
+      navigate(`/main/${collabId}`, {
+        state: {
+          collabName: collab.data().title,
+          discId: discId,
+        },
+      });
+    });
+  };
+
+  useEffect(() => {
+    setIsLoading(true);
+    onSnapshot(discColRef, (snapshot) => {
+      Promise.all(
+        snapshot.docs.map((discInfo) => {
+          return getDoc(
+            doc(
+              db,
+              "collaborations",
+              discInfo.data().collabId,
+              "discussions",
+              discInfo.data().discId
+            )
+          ).then((res) => {
+            return {
+              ...res.data(),
+              id: res.id,
+              collabId: discInfo.data().collabId,
+            };
+          });
+        })
+      ).then((allValues) => {
+        setAllDiscs(
+          allValues.map((disc) => (
+            <div
+              key={disc.id}
+              onClick={(e) => handleGoToDisc(e, disc.collabId, disc.id)}
+            >
+              {disc.title}
+            </div>
+          ))
+        );
+        setIsLoading(false);
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    console.log(allDiscs);
+  }, [allDiscs]);
+
   return (
     <>
-      <header className="absolute top-0 w-full z-30">
-        <div className="max-w-6xl mx-auto px-2 sm:px-6">
-          <div className="flex items-center justify-between h-20">
+      <div className=" h-[41rem] p-4 gap-2 flex flex-col sm:flex-row ">
+        <div className="h-full bg-gray-700/25 w-full flex flex-col items-center justify-between p-8 sm:w-1/2 md:w-1/3 lg:w-1/4">
+          <div className="absolute top-8 left-8 ">
             <Link to="/main" className="block">
               <svg
                 className="w-8 h-8 fill-current text-purple-600"
@@ -18,18 +86,37 @@ const Profile = () => {
               </svg>
             </Link>
           </div>
-        </div>
-      </header>
-
-      <div className="mt-20 h-[34rem] p-4 flex gap-4 flex-col sm:flex-row ">
-        <div className="h-full bg-gray-700/25 w-full flex flex-col items-center justify-between p-8 sm:w-1/2 md:w-1/3 lg:w-1/4">
-          <div className="w-32 h-32 rounded-full bg-blue-500  "></div>
+          <div className="w-32 h-32  relative ">
+            <img
+              className="w-32 h-32 rounded-full"
+              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+              alt="user photo"
+            />
+            <div className="absolute bottom-1 right-1 w-8 h-8 bg-gray-500 rounded-full p-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6 "
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                />
+              </svg>
+            </div>
+          </div>
+          <EditInput />
           <EditInput />
           <EditInput />
           <button className="bg-purple-600 p-2 w-52 rounded-md">Logout</button>
         </div>
-        <div className="h-full bg-gray-700/25 w-full p-4 flex justify-center sm:w-1/2 md:w-2/3 lg:w-3/4">
+        <div className="h-full bg-gray-700/25 w-full p-4 flex flex-col items-center sm:w-1/2 md:w-2/3 lg:w-3/4">
           <Tabs />
+          {isLoading ? <Loading /> : allDiscs}
         </div>
       </div>
     </>

@@ -22,6 +22,7 @@ import Requests from "./Requests";
 import PostMaterial from "./PostMaterial";
 import Meetings from "../Meetings/Meetings";
 import Details from "./Details";
+import Discussion from "./Discussion";
 
 const Collaboration = () => {
   const [currentComponent, setCurrentComponent] = useState();
@@ -40,12 +41,21 @@ const Collaboration = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [requestsCount, setRequestsCount] = useState("0");
   const { state } = useLocation();
-  const { collabName } = state;
+  const { collabName, discId = null } = state;
 
   useEffect(() => {
-    setCurrentComponent(
-      <Discussions setCurrentComponent={setCurrentComponent} />
-    );
+    if (!discId) {
+      setCurrentComponent(
+        <Discussions setCurrentComponent={setCurrentComponent} />
+      );
+    } else {
+      setCurrentComponent(
+        <Discussion
+          discussionId={discId}
+          setCurrentComponent={setCurrentComponent}
+        />
+      );
+    }
   }, []);
 
   const handleSidebarClick = (component) => {

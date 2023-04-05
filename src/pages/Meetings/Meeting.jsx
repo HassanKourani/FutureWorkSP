@@ -1,27 +1,29 @@
 import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 
-const Meeting = ({ meeting }) => {
-  console.log(meeting);
+const Meeting = () => {
+  const mid = useParams().mid;
+
   const onMeeting1Click = () => {
-    const meeting = new VideoSDKMeeting();
+    const meetingSDK = new VideoSDKMeeting();
     const config = {
-      name: `${meeting.name}`,
+      name: `Meeting 1`,
       apiKey: "8769e4f2-f266-4bf6-b0d3-275024b10e0b",
-      meetingId: `${meeting.id}`,
-      redirectOnLeave: "https://www.videosdk.live/",
+      meetingId: `${mid}`,
+      redirectOnLeave: "",
       micEnabled: true,
       webcamEnabled: true,
       participantCanToggleSelfWebcam: true,
       participantCanToggleSelfMic: true,
       joinScreen: {
         visible: true,
-        title: `${meeting.name}`,
-        meetingUrl: `${window.location.href}/${meeting.id}`,
+        title: `Guest`,
+        meetingUrl: `${window.location.href}`,
         target: "_blank",
       },
       screenShareEnabled: true,
     };
-    meeting.init(config);
+    meetingSDK.init(config);
   };
 
   useEffect(() => {
@@ -43,7 +45,7 @@ const Meeting = ({ meeting }) => {
   return (
     <div className="bg-gray-500/50 p-12 flex flex-col items-center hover:bg-gray-400/50 cursor-pointer">
       <span>
-        Title: <b className="text-blue-200">{meeting.name}</b>
+        Title: <b className="text-blue-200">meeting 1</b>
       </span>
       <button
         onClick={onMeeting1Click}

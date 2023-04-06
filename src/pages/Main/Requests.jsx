@@ -56,9 +56,7 @@ const Requests = () => {
   }, []);
 
   const handleDelete = (requestId) => {
-    deleteDoc(doc(db, "collaborations", uid, "requests", requestId)).then(() =>
-      console.log("deleted")
-    );
+    deleteDoc(doc(db, "collaborations", uid, "requests", requestId));
   };
   const handleAccept = (request) => {
     addDoc(collection(db, "collaborations", uid, "users"), {
@@ -66,9 +64,7 @@ const Requests = () => {
       userName: request.data().requestedName,
       userImage: request.data().requestedImage,
     });
-    deleteDoc(doc(db, "collaborations", uid, "requests", request.id)).then(() =>
-      console.log("deleted")
-    );
+    deleteDoc(doc(db, "collaborations", uid, "requests", request.id));
   };
 
   return (

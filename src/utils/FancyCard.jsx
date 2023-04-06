@@ -25,21 +25,18 @@ const FancyCard = ({ collab }) => {
       );
     });
   }, []);
-  useEffect(() => {
-    console.log(favCollabs);
-  }, [favCollabs]);
+  useEffect(() => {}, [favCollabs]);
 
   const handleAddFav = (e) => {
     e.stopPropagation();
-    console.log(collab.id);
+
     setDoc(doc(db, "users", user.id, "favorite", collab.id), {
       collabId: collab.id,
     });
   };
   const handleRemoveFav = (e) => {
     e.stopPropagation();
-    console.log(collab.id);
-    console.log(user.id);
+
     deleteDoc(doc(db, "users", user.id, "favorite", collab.id))
       .then(() => {})
       .catch((err) => {

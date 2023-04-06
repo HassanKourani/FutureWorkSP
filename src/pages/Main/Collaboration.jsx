@@ -23,6 +23,7 @@ import PostMaterial from "./PostMaterial";
 import Meetings from "../Meetings/Meetings";
 import Details from "./Details";
 import Discussion from "./Discussion";
+import CreateMeetingModal from "../../utils/CreateMeetingModal";
 
 const Collaboration = () => {
   const [currentComponent, setCurrentComponent] = useState();
@@ -39,6 +40,8 @@ const Collaboration = () => {
   const userQuery = query(usersColRef, where("userId", "==", user.id));
   const [isRequested, setIsRequested] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isCreateMeetingModalOpen, setIsCreateMeetingModalOpen] =
+    useState(false);
   const [requestsCount, setRequestsCount] = useState("0");
   const { state } = useLocation();
   const { collabName, discId = null } = state;
@@ -88,6 +91,9 @@ const Collaboration = () => {
     if (currentComponentName == "materials") {
       setCurrentComponent(<PostMaterial />);
     }
+    if (currentComponentName == "meetings") {
+      setIsCreateMeetingModalOpen(true);
+    }
   };
   useEffect(() => {
     onSnapshot(collaborationDocRef, (doc) => {
@@ -96,7 +102,6 @@ const Collaboration = () => {
     });
 
     onSnapshot(userQuery, (doc) => {
-      console.log(doc.empty);
       setIsJoined(!doc.empty);
     });
 
@@ -448,7 +453,8 @@ const Collaboration = () => {
               {/* ---------------------------button--------------------------- */}
               {(isJoined || !isPrivate) &&
                 (currentComponentName == "discussions" ||
-                  currentComponentName == "materials") && (
+                  currentComponentName == "materials" ||
+                  currentComponentName == "meetings") && (
                   <li>
                     <div
                       className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700"
@@ -459,7 +465,9 @@ const Collaboration = () => {
                           type="submit"
                           className="text-white w-full bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800"
                         >
-                          Post
+                          {currentComponentName == "meetings"
+                            ? "Create Meeting"
+                            : "Post"}
                         </button>
                       </span>
                     </div>
@@ -523,6 +531,11 @@ const Collaboration = () => {
         isOpen={isDeleteModalOpen}
         setIsOpen={setIsDeleteModalOpen}
         onClick={() => handleColDelete()}
+      />
+
+      <CreateMeetingModal
+        isOpen={isCreateMeetingModalOpen}
+        setIsOpen={setIsCreateMeetingModalOpen}
       />
     </>
   );

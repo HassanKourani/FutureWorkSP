@@ -45,14 +45,11 @@ const PostMaterial = () => {
         addDoc(collection(db, "users", user.id, "folders"), {
           folderName: title,
         }).then((userRes) => {
-          console.log(res.id);
           let i = 1;
           Array.from(files).map((file) => {
             const fileRef = ref(storage, file.name);
             uploadBytes(fileRef, file).then(() => {
               getDownloadURL(fileRef).then((url) => {
-                console.log(url);
-
                 addDoc(
                   collection(
                     db,
@@ -91,7 +88,6 @@ const PostMaterial = () => {
                   }
                 )
                   .then(() => {
-                    console.log("i was here");
                     if (i === files.length) setIsLoading(false);
                     i++;
                   })

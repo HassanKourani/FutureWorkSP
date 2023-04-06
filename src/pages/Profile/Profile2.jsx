@@ -1,40 +1,101 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import EditInput from "../../utils/EditInput";
 import Tabs from "../../utils/Tabs";
 import { Fragment, useEffect, useState } from "react";
-import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
-import { db } from "../../Config";
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
+import { db, storage } from "../../Config";
 import { SessionService } from "../../SessionService";
 import Loading from "../../utils/Loading";
 import ProfileAccordionFolder from "./ProfileAccordionFolder";
 import { Accordion } from "@szhsin/react-accordion";
 import Settings from "./Settings";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const Profile2 = () => {
+  const user = SessionService.getUser();
   const [allDiscs, setAllDiscs] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState();
   const [folders, setFolders] = useState();
-  const [newName, setNewName] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [newBanner, setNewBanner] = useState("");
+  const [newName, setNewName] = useState(user.name);
+  const [newDescription, setNewDescription] = useState(user.description);
+  const [newBanner, setNewBanner] = useState(user.banner);
   const [bannerImage, setBannerImage] = useState("");
-  const [newProfileImg, setNewProfileImg] = useState("");
+  const [newProfileImg, setNewProfileImg] = useState(user.profile);
   const [profileImage, setProfileImage] = useState("");
 
   /// change and add uid to the url
-  const user = SessionService.getUser();
+
   const navigate = useNavigate();
+  // const uid = useParams().userId
 
   const discColRef = collection(db, "users", user.id, "discussions");
   const foldersColRef = collection(db, "users", user.id, "folders");
 
+  //  const isUserProfile=()=>{
+  //   return(
+  //       user.id===uid
+  //   )
+  //  }
+
+  const handleUpdateProfile = (e) => {
+    const profileRef = ref(storage, newProfileImg.name);
+    Promise.all([uploadBytes(profileRef, newProfileImg)]).then(() => {
+      Promise.all([, getDownloadURL(profileRef)]).then((urls) => {
+        const [url1, url2] = urls;
+        updateDoc(doc(db, "users", user.id), {
+          name: newName,
+          description: newDescription,
+          banner: url1,
+          profile: url2,
+        });
+
+        SessionService.setUser({
+          name: newName,
+          description: newDescription,
+          banner: url1,
+          profile: url2,
+          id: user.id,
+          email: user.email,
+        });
+      });
+    });
+  };
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
+
   const handleChangeBanner = (e) => {
     e.preventDefault();
 
-    e.target.files[0] && setNewBanner(e.target.files[0]);
+    // e.target.files[0] && setNewBanner(e.target.files[0]);
     if (e.target.files && e.target.files[0]) {
-      setBannerImage(URL.createObjectURL(e.target.files[0]));
+      const bannerRef = ref(storage, e.target.files[0].name);
+      uploadBytes(bannerRef, e.target.files[0]).then(() => {
+        getDownloadURL(bannerRef).then((url) => {
+          updateDoc(doc(db, "users", user.id), {
+            banner: url,
+          }).then((res) => {
+            console.log("updated banner");
+            console.log(res);
+          });
+          SessionService.setUser({
+            name: user.name,
+            description: user.description,
+            banner: url,
+            profile: user.profile,
+            id: user.id,
+            email: user.email,
+          });
+        });
+      });
     }
   };
   const handleChangeProfilePicture = (e) => {
@@ -87,8 +148,6 @@ const Profile2 = () => {
       ).then((allValues) => {
         setAllDiscs(
           allValues.map((disc) => {
-            console.log(disc);
-
             return (
               <div
                 className="py-2 px-4 m-1 bg-gray-800/50 hover:bg-gray-700/50 cursor-pointer"
@@ -119,7 +178,6 @@ const Profile2 = () => {
     onSnapshot(foldersColRef, (snapshot) => {
       setFolders(
         snapshot.docs.map((folder) => {
-          console.log(folder.id);
           return (
             <Fragment key={folder.id}>
               <ProfileAccordionFolder
@@ -139,8 +197,8 @@ const Profile2 = () => {
   return (
     <>
       {/* --------------------LOGO --------------------------------*/}
-      <div className=" bg-gray-900 flex flex-col h-full lg:px-36 py-8">
-        <div className="absolute top-8 left-8 ">
+      <div className=" bg-gray-900 flex flex-col h-full  lg:px-36 lg:py-8">
+        <div className="absolute top-8 left-8 z-50 ">
           <Link to="/main" className="block">
             <svg
               className="w-8 h-8 fill-current text-purple-600"
@@ -156,50 +214,78 @@ const Profile2 = () => {
         <div className=" bg-gray-700/25 h-full rounded-lg">
           <div className="relative h-72 ">
             {/* -------------------- Banner --------------------------------*/}
-            <div className="w-full h-56 bg-blue-500 rounded-lg">
+            <div className=" relative w-full h-56  rounded-lg">
               <img
-                src={bannerImage}
-                className=" absolute w-full h-56 bg-blue-500 rounded-lg"
+                src={
+                  selectedTab === "settings" && bannerImage
+                    ? bannerImage
+                    : user.banner
+                }
+                className=" w-full h-full  rounded-lg object-cover"
+              />
+              {selectedTab === "settings" && (
+                <>
+                  <div className=" h-full ">
+                    {/* <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-12 h-12 "
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg> */}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="w-full h-full absolute top-0  bg-transparent text-transparent file:bg-transparent file:text-transparent file:border-transparent focus:outline-none"
+                    onChange={handleChangeBanner}
+                  />
+                </>
+              )}
+            </div>
+
+            {/*-------------------- profile picture --------------------------*/}
+            <div className="absolute  top-36 sm:left-16 w-36 h-36 left-1/3">
+              <img
+                className=" rounded-full object-cover"
+                src={
+                  selectedTab === "settings" && profileImage
+                    ? profileImage
+                    : user.profile
+                }
+                alt="user photo"
               />
               {selectedTab === "settings" && (
                 <input
                   type="file"
                   accept="image/*"
-                  className="w-full h-56 absolute top-0  bg-transparent text-transparent file:bg-transparent file:text-transparent file:border-transparent"
-                  onChange={handleChangeBanner}
+                  className="absolute top-0  w-36 h-36 rounded-full  bg-transparent text-transparent file:bg-transparent file:text-transparent file:border-transparent"
+                  onChange={handleChangeProfilePicture}
                 />
               )}
             </div>
-
-            {/*-------------------- profile picture --------------------------*/}
-
-            <img
-              className="absolute  top-36 left-16 w-36 h-36 rounded-full"
-              src={profileImage}
-              alt="user photo"
-            />
-            {selectedTab === "settings" && (
-              <input
-                type="file"
-                accept="image/*"
-                className="absolute  top-36 left-16 w-36 h-36 rounded-full  bg-transparent text-transparent file:bg-transparent file:text-transparent file:border-transparent"
-                onChange={handleChangeProfilePicture}
-              />
-            )}
-
-            <label className="text-3xl absolute md:left-60 ">Name</label>
           </div>
-          <div className="pl-16 pt-4">
-            <label className="text-xl">description</label>
+          <div className="flex justify-center sm:justify-start sm:ml-16">
+            <label className="text-3xl">{user.name}</label>
+          </div>
+          <div className="flex justify-center sm:justify-start sm:pl-16 pt-4">
+            <label className="text-xl">{user.description}</label>
           </div>
 
           {/* main */}
 
-          <div className="p-8">
+          <div className="p-8 m-auto">
             <Tabs selectedTab={selectedTab} handleTabSelect={handleTabSelect} />
 
             {selectedTab === folders ? (
-              <div className="app pr-4">
+              <div className="app pr-4 mt-4">
                 <Accordion transition transitionTimeout={1000}>
                   {folders && folders}
                 </Accordion>
@@ -209,7 +295,7 @@ const Profile2 = () => {
             ) : selectedTab === "settings" ? (
               <div className="flex flex-col p-4 gap-4 items-start">
                 <label>Edit Profile</label>
-                <div className="flex flex-col p-4 w-1/3 gap-4 items-start visible">
+                <div className="flex flex-col p-4  gap-4 items-start visible">
                   <input
                     type="text"
                     placeholder="New Name"

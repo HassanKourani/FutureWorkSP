@@ -4,7 +4,7 @@
     flex-wrap: wrap;
     height: max-content;
     border-radius: 0.5rem;
-    background-color: #ABABFF;
+    background-color: #33363A;
     box-sizing: border-box;
     box-shadow: 0 0 0px 1px rgba(0, 0, 0, 0.06);
     padding: 0.25rem;
@@ -34,6 +34,6 @@
 }
 
 .radio-inputs .radio input:checked+.name {
-    background-color: #8D8DFF;
+    background-color: #38379C;
     font-weight: 600;
 }

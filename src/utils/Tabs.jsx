@@ -3,7 +3,7 @@ import "./Tabs.css";
 const Tabs = ({ handleTabSelect }) => {
   return (
     <>
-      <div className="radio-inputs">
+      <div className="radio-inputs m-auto">
         <label className="radio" onClick={() => handleTabSelect("discussions")}>
           <input type="radio" name="radio" defaultChecked />
           <span className="name">Discussions</span>

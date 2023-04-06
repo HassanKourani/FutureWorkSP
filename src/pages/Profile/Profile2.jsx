@@ -15,12 +15,35 @@ const Profile2 = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState();
   const [folders, setFolders] = useState();
+  const [newName, setNewName] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+  const [newBanner, setNewBanner] = useState("");
+  const [bannerImage, setBannerImage] = useState("");
+  const [newProfileImg, setNewProfileImg] = useState("");
+  const [profileImage, setProfileImage] = useState("");
 
   const user = SessionService.getUser();
   const navigate = useNavigate();
 
   const discColRef = collection(db, "users", user.id, "discussions");
   const foldersColRef = collection(db, "users", user.id, "folders");
+
+  const handleChangeBanner = (e) => {
+    e.preventDefault();
+
+    e.target.files[0] && setNewBanner(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      setBannerImage(URL.createObjectURL(e.target.files[0]));
+    }
+  };
+  const handleChangeProfilePicture = (e) => {
+    e.preventDefault();
+
+    e.target.files[0] && setNewProfileImg(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      setProfileImage(URL.createObjectURL(e.target.files[0]));
+    }
+  };
 
   const handleGoToDisc = (e, collabId, discId) => {
     getDoc(doc(db, "collaborations", collabId)).then((collab) => {
@@ -62,28 +85,32 @@ const Profile2 = () => {
         })
       ).then((allValues) => {
         setAllDiscs(
-          allValues.map((disc) => (
-            <div
-              className="py-2 px-4 m-1 bg-gray-800/50"
-              key={disc.id}
-              onClick={(e) => handleGoToDisc(e, disc.collabId, disc.id)}
-            >
-              <div className="flex items-center justify-between">
-                <h1>{disc.title}</h1>
+          allValues.map((disc) => {
+            console.log(disc);
 
-                <h1>
-                  {disc.createdAt && (
-                    <div className="flex gap-1 items-center text-gray-400/75 text-xs	">
-                      {new Date(disc.createdAt.seconds * 1000).getDate()} /
-                      {new Date(disc.createdAt.seconds * 1000).getMonth() + 1}/
-                      {new Date(disc.createdAt.seconds * 1000).getFullYear()}
-                    </div>
-                  )}
-                </h1>
+            return (
+              <div
+                className="py-2 px-4 m-1 bg-gray-800/50 hover:bg-gray-700/50 cursor-pointer"
+                key={disc.id}
+                onClick={(e) => handleGoToDisc(e, disc.collabId, disc.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <h1>{disc.title}</h1>
+
+                  <h1>
+                    {disc.createdAt && (
+                      <div className="flex gap-1 items-center text-gray-400/75 text-xs	">
+                        {new Date(disc.createdAt.seconds * 1000).getDate()} /
+                        {new Date(disc.createdAt.seconds * 1000).getMonth() + 1}
+                        /{new Date(disc.createdAt.seconds * 1000).getFullYear()}
+                      </div>
+                    )}
+                  </h1>
+                </div>
+                <h1>{disc.question}</h1>
               </div>
-              <h1>{disc.question}</h1>
-            </div>
-          ))
+            );
+          })
         );
         setIsLoading(false);
       });
@@ -110,6 +137,7 @@ const Profile2 = () => {
 
   return (
     <>
+      {/* --------------------LOGO --------------------------------*/}
       <div className=" bg-gray-900 flex flex-col h-full lg:px-36 py-8">
         <div className="absolute top-8 left-8 ">
           <Link to="/main" className="block">
@@ -122,17 +150,42 @@ const Profile2 = () => {
             </svg>
           </Link>
         </div>
+
+        {/* -------------------- Header --------------------------------*/}
         <div className=" bg-gray-700/25 h-full rounded-lg">
           <div className="relative h-72 ">
-            {/* banner */}
-            <div className="w-full h-56 bg-blue-500 rounded-lg"></div>
-            {/* profile picture */}
+            {/* -------------------- Banner --------------------------------*/}
+            <div className="w-full h-56 bg-blue-500 rounded-lg">
+              <img
+                src={bannerImage}
+                className=" absolute w-full h-56 bg-blue-500 rounded-lg"
+              />
+              {selectedTab === "settings" && (
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="w-full h-56 absolute top-0  bg-transparent text-transparent file:bg-transparent file:text-transparent file:border-transparent"
+                  onChange={handleChangeBanner}
+                />
+              )}
+            </div>
+
+            {/*-------------------- profile picture --------------------------*/}
 
             <img
               className="absolute  top-36 left-16 w-36 h-36 rounded-full"
-              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+              src={profileImage}
               alt="user photo"
             />
+            {selectedTab === "settings" && (
+              <input
+                type="file"
+                accept="image/*"
+                className="absolute  top-36 left-16 w-36 h-36 rounded-full  bg-transparent text-transparent file:bg-transparent file:text-transparent file:border-transparent"
+                onChange={handleChangeProfilePicture}
+              />
+            )}
+
             <label className="text-3xl absolute md:left-60 ">Name</label>
           </div>
           <div className="pl-16 pt-4">
@@ -153,7 +206,31 @@ const Profile2 = () => {
             ) : selectedTab === allDiscs ? (
               <div className="app p-4">{allDiscs && allDiscs}</div>
             ) : selectedTab === "settings" ? (
-              <Settings />
+              <div className="flex flex-col p-4 gap-4 items-start">
+                <label>Edit Profile</label>
+                <div className="flex flex-col p-4 w-1/3 gap-4 items-start visible">
+                  <input
+                    type="text"
+                    placeholder="New Name"
+                    className="bg-gray-700/50 w-full rounded-lg"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                  />
+                  <textarea
+                    placeholder="New Description"
+                    className="bg-gray-700/50 w-full rounded-lg"
+                    value={newDescription}
+                    onChange={(e) => setNewDescription(e.target.value)}
+                  ></textarea>
+                  <button
+                    className="bg-purple-600 p-2 w-full rounded-lg"
+                    onClick={(e) => handleUpdateProfile(e)}
+                  >
+                    Update Profile
+                  </button>
+                </div>
+                <button> Logout</button>
+              </div>
             ) : (
               <></>
             )}

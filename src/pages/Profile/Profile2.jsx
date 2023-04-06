@@ -16,6 +16,7 @@ const Profile2 = () => {
   const [selectedTab, setSelectedTab] = useState();
   const [folders, setFolders] = useState();
 
+  /// change and add uid to the url
   const user = SessionService.getUser();
   const navigate = useNavigate();
 

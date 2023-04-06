@@ -41,7 +41,7 @@
     width: 160px;
     height: 160%;
     background: linear-gradient(90deg, transparent, #5D5DFF, #5D5DFF, #5D5DFF, #5D5DFF, transparent);
-    animation: rotation_481 5000ms infinite linear;
+    animation: rotation_481 30s infinite linear;
 }
 
 .back-content {

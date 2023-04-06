@@ -53,7 +53,6 @@ const Discussions = ({ setCurrentComponent }) => {
     if (search) {
       setSearchedDiscussions(
         discussions.filter((discussion) => {
-          console.log(discussion);
           return discussion.title.toLowerCase().includes(search.toLowerCase());
         })
       );

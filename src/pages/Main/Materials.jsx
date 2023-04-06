@@ -18,7 +18,6 @@ const Materials = () => {
     onSnapshot(foldersColRef, (snapshot) => {
       setFolders(
         snapshot.docs.map((folder) => {
-          console.log(folder.data());
           return (
             <Fragment key={folder.id}>
               <AccordionFolder folder={{ ...folder.data(), id: folder.id }} />

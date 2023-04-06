@@ -56,7 +56,6 @@ const Main = () => {
       });
       setSearchedCollabs(sorterdArr);
     }
-    console.log("ran");
   }, [collaborations, favCollabs]);
 
   const handleSearch = (e) => {

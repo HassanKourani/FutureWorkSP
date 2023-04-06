@@ -43,10 +43,9 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
 
   const handleChooseAnswer = (e, commentId) => {
     e.preventDefault();
-    console.log(commentId);
     updateDoc(doc(db, "collaborations", uid, "discussions", discussion.id), {
       isAnswered: true,
-    }).then(() => console.log("updated"));
+    });
     updateDoc(
       doc(
         db,
@@ -58,14 +57,14 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
         commentId
       ),
       { isAnswer: true }
-    ).then(() => console.log("answer"));
+    );
   };
   const handleRemoveAnswer = (e, commentId) => {
     e.preventDefault();
-    console.log(commentId);
+
     updateDoc(doc(db, "collaborations", uid, "discussions", discussion.id), {
       isAnswered: false,
-    }).then(() => console.log("updated"));
+    });
     updateDoc(
       doc(
         db,
@@ -77,7 +76,7 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
         commentId
       ),
       { isAnswer: false }
-    ).then(() => console.log("answer"));
+    );
   };
 
   const commentsColRef = collection(
@@ -102,9 +101,7 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
         "comments",
         commentId
       )
-    ).then(() => {
-      console.log("deleted");
-    });
+    );
   };
 
   useEffect(() => {

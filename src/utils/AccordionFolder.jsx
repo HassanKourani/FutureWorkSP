@@ -35,8 +35,11 @@ const AccordionFolder = ({ folder }) => {
     ).then((docs) =>
       setMaterials(
         docs.docs.map((material) => (
-          <div className="p-2 flex items-center justify-between">
-            <li key={material.id}>{material.data().name}</li>
+          <div
+            key={material.id}
+            className="p-2 flex items-center justify-between"
+          >
+            <li>{material.data().name}</li>
 
             <a href={material.data().link} download>
               <svg

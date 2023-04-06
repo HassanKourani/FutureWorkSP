@@ -34,29 +34,59 @@ const Details = () => {
           })
         )
       ).then((usersList) => {
-        setUsers(
-          usersList.map((element) => {
-            return (
-              <div key={element.id}>
-                <li>{element.name}</li>
-              </div>
-            );
+        console.log(usersList);
+        Promise.all(
+          usersList.map((e) => {
+            return getDoc(doc(db, "users", e.id)).then((res) => {
+              return { ...res.data(), id: e.id };
+            });
           })
-        );
+        ).then((newUserList) => {
+          setUsers(
+            newUserList.map((element) => {
+              return (
+                <div
+                  className="py-4 px-4 m-1 bg-gray-800/50 hover:bg-gray-600/50 cursor-pointer"
+                  key={element.id}
+                  //onClick={(e) => handleGoToDisc(e, disc.collabId, disc.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <img
+                        className="w-8 h-8 rounded-full object-cover"
+                        src={
+                          element.profile
+                            ? element.profile
+                            : "https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                        }
+                        alt="user photo"
+                      />
+                      <h1>{element.name}</h1>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          );
+        });
       });
   }, [usersId]);
   return (
     <>
       {collab && (
-        <div className="flex justify-between p-4">
-          <h2>{collab.description}</h2>
-          <label>{collab.isPrivate ? "Private" : "public"}</label>
+        <div className="flex justify-between px-4">
+          <h2 className="text-purple-500 text-2xl font-bold">
+            {collab.description}
+          </h2>
+          <label className="border border-gray-400 rounded-full py-1 px-4">
+            {collab.isPrivate ? "Private" : "public"}
+          </label>
         </div>
       )}
       <div>
-        <label>Users</label>
+        <label className="">Users</label>
       </div>
-      {users && <ul>{users}</ul>}
+      {users && <ul className="pr-4">{users}</ul>}
     </>
   );
 };

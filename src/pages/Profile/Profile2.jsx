@@ -22,6 +22,7 @@ const Profile2 = () => {
   const [newProfileImg, setNewProfileImg] = useState("");
   const [profileImage, setProfileImage] = useState("");
 
+  /// change and add uid to the url
   const user = SessionService.getUser();
   const navigate = useNavigate();
 

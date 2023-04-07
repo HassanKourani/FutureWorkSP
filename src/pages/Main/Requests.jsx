@@ -4,6 +4,7 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
+  setDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -59,11 +60,12 @@ const Requests = () => {
     deleteDoc(doc(db, "collaborations", uid, "requests", requestId));
   };
   const handleAccept = (request) => {
-    addDoc(collection(db, "collaborations", uid, "users"), {
-      userId: request.data().requestedId,
-      userName: request.data().requestedName,
-      userImage: request.data().requestedImage,
-    });
+    setDoc(
+      doc(db, "collaborations", uid, "users", request.data().requestedId),
+      {
+        userName: request.data().requestedName,
+      }
+    );
     deleteDoc(doc(db, "collaborations", uid, "requests", request.id));
   };
 

@@ -41,7 +41,7 @@ const CreateQuestion = ({ setCurrentComponent }) => {
             isAnswered: false,
             createdAt: serverTimestamp(),
           })
-            .then(() => {
+            .then((res) => {
               setIsLoading(false);
               setCurrentComponent(
                 <Discussions setCurrentComponent={setCurrentComponent} />

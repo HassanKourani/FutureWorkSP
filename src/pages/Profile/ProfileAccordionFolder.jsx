@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import styles from "../../utils/AccordionFolder.module.css";
 import chevronDown from "../../utils/Chevron-down.svg";
 import { SessionService } from "../../SessionService";
+import { useParams } from "react-router-dom";
 
 const AccordionItem = ({ header, ...rest }) => (
   <Item
@@ -27,11 +28,11 @@ const AccordionItem = ({ header, ...rest }) => (
 
 const ProfileAccordionFolder = ({ folder }) => {
   const [materials, setMaterials] = useState([]);
-  const user = SessionService.getUser();
+  const uid = useParams().userId;
 
   useEffect(() => {
     getDocs(
-      collection(db, "users", user.id, "folders", folder.id, "materials")
+      collection(db, "users", uid, "folders", folder.id, "materials")
     ).then((docs) =>
       setMaterials(
         docs.docs.map((material) => (

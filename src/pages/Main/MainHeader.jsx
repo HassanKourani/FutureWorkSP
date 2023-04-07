@@ -1,16 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Dropdown from "../../utils/Dropdown";
+import { SessionService } from "../../SessionService";
 
 function MainHeader({ setSearch, search, handleSearch }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const user = SessionService.getUser();
   const path = window.location.pathname;
   const navigate = useNavigate();
-  const onProfileClick = () => {
-    navigate(`/profile`, {
-      state: {},
-    });
-  };
 
   const trigger = useRef(null);
   const mobileNav = useRef(null);
@@ -80,7 +77,7 @@ function MainHeader({ setSearch, search, handleSearch }) {
               </li>
               <li>
                 <Link
-                  to="/profile"
+                  to={`/profile/${user.id}`}
                   className="font-medium text-purple-600 hover:text-gray-200 px-4 py-3 flex items-center transition duration-150 ease-in-out"
                 >
                   Profile
@@ -148,7 +145,7 @@ function MainHeader({ setSearch, search, handleSearch }) {
               <ul className="bg-gray-800 px-4 py-2">
                 <li>
                   <Link
-                    to="/profile"
+                    to={`/profile/${user.id}`}
                     className="flex font-medium w-full text-purple-600 hover:text-gray-200 py-2 justify-center"
                   >
                     Profile

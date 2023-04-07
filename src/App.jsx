@@ -44,7 +44,7 @@ function App() {
         <Route path="/createCollab" element={<CreateCollab />} />
         <Route path="/main/:uid" element={<Collaboration />} />
         {/* <Route path="/profile" element={<Profile />} /> */}
-        <Route path="/profile" element={<Profile2 />} />
+        <Route path="/profile/:userId" element={<Profile2 />} />
         <Route path="/main/:uid/:mid" element={<Meeting />} />
 
         {/* <Route path="/reset-password" element={<ResetPassword />} /> */}

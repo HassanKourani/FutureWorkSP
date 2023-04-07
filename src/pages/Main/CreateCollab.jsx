@@ -9,7 +9,7 @@ import { auth } from "../../Config";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { db } from "../../Config";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { SessionService } from "../../SessionService";
 import "./Main.css";
 
@@ -31,8 +31,8 @@ function CreateCollab() {
       isPrivate: isPrivate,
       title: title,
     }).then((res) => {
-      const usersColRef = collection(db, "collaborations", res.id, "users");
-      addDoc(usersColRef, { userId: user.id }).then(() => navigate("/main"));
+      const usersColRef = doc(db, "collaborations", res.id, "users", user.id);
+      setDoc(usersColRef, { userId: user.id }).then(() => navigate("/main"));
     });
   };
   return (

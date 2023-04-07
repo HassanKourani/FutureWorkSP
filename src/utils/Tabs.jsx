@@ -1,6 +1,6 @@
 import "./Tabs.css";
 
-const Tabs = ({ handleTabSelect }) => {
+const Tabs = ({ handleTabSelect, isUserProfile }) => {
   return (
     <>
       <div className="radio-inputs m-auto">
@@ -12,10 +12,12 @@ const Tabs = ({ handleTabSelect }) => {
           <input type="radio" name="radio" />
           <span className="name">Materials</span>
         </label>
-        <label className="radio" onClick={() => handleTabSelect("settings")}>
-          <input type="radio" name="radio" />
-          <span className="name">Settings</span>
-        </label>
+        {isUserProfile() && (
+          <label className="radio" onClick={() => handleTabSelect("settings")}>
+            <input type="radio" name="radio" />
+            <span className="name">Settings</span>
+          </label>
+        )}
       </div>
     </>
   );

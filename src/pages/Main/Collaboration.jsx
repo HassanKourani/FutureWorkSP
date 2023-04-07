@@ -101,8 +101,8 @@ const Collaboration = () => {
       setIsAdmin(doc.data().uid === user.id);
     });
 
-    onSnapshot(userQuery, (doc) => {
-      setIsJoined(!doc.empty);
+    onSnapshot(doc(db, "collaborations", uid, "users", user.id), (doc) => {
+      setIsJoined(doc.exists());
     });
 
     const requestsColRef = collection(db, "collaborations", uid, "requests");
@@ -119,15 +119,10 @@ const Collaboration = () => {
   const handleUserState = () => {
     if (isJoined) {
       // leave
-      const q = query(
-        collection(db, "collaborations", uid, "users"),
-        where("userId", "==", user.id)
+
+      deleteDoc(doc(db, "collaborations", uid, "users", user.id)).then(() =>
+        navigate("/main")
       );
-      getDocs(q).then((res) => {
-        deleteDoc(doc(db, "collaborations", uid, "users", res.docs[0].id)).then(
-          () => navigate("/main")
-        );
-      });
     } else {
       // request
       if (!isRequested) {

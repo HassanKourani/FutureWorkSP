@@ -34,6 +34,7 @@ module.exports = {
         "9/16": "56.25%",
         "3/4": "75%",
         "1/1": "100%",
+        "41/100": "41%",
       },
       fontFamily: {
         inter: ["Inter", "sans-serif"],

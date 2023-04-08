@@ -7,6 +7,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../Config";
 import Switch from "../../utils/Switch";
@@ -28,9 +29,9 @@ const Details = () => {
       setIsPrivate(res.data().isPrivate);
     });
 
-    getDocs(collection(db, "collaborations", uid, "users")).then((res) => {
+    onSnapshot(collection(db, "collaborations", uid, "users"), (snapshot) => {
       setUsersId(
-        res.docs.map((user) => {
+        snapshot.docs.map((user) => {
           return user.id;
         })
       );
@@ -64,8 +65,9 @@ const Details = () => {
   }, [usersId]);
 
   const handleRemoveUser = (e) => {
-    console.log(selectedId);
-    deleteDoc(doc(db, "collaborations", uid, "users", selectedId));
+    deleteDoc(doc(db, "collaborations", uid, "users", selectedId)).then(() => {
+      setIsConfirmationModalOpen(false);
+    });
   };
 
   return (

@@ -11,13 +11,15 @@ import {
   query,
   updateDoc,
 } from "firebase/firestore";
-import { db, storage } from "../../Config";
+import { db, storage, auth } from "../../Config";
 import { SessionService } from "../../SessionService";
 import Loading from "../../utils/Loading";
 import ProfileAccordionFolder from "./ProfileAccordionFolder";
 import { Accordion } from "@szhsin/react-accordion";
 import Settings from "./Settings";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import MiniSideBar from "../../utils/MiniSideBar";
+import { updatePassword } from "firebase/auth";
 
 const Profile2 = () => {
   const user = SessionService.getUser();
@@ -29,11 +31,10 @@ const Profile2 = () => {
   const [folders, setFolders] = useState();
   const [newName, setNewName] = useState(user.name);
   const [newDescription, setNewDescription] = useState(user.description);
-  const [bannerImage, setBannerImage] = useState("");
-  const [profileImage, setProfileImage] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [loader, setLoader] = useState("");
-
-  /// change and add uid to the url
+  const [settingsComponent, setSettingsComponent] = useState("details");
+  const authUser = auth.currentUser;
 
   const navigate = useNavigate();
   const uid = useParams().userId;
@@ -81,6 +82,18 @@ const Profile2 = () => {
       email: user.email,
     });
     setUpdatedUser(SessionService.getUser());
+  };
+
+  const handleUpdatePassword = (e) => {
+    setLoader("pass");
+    e.preventDefault();
+    updatePassword(authUser, newPassword)
+      .then(() => {
+        console.log("password updated");
+        setNewPassword("");
+        setLoader("");
+      })
+      .catch((err) => console.log(err));
   };
 
   const handleChangeBanner = (e) => {
@@ -432,49 +445,60 @@ const Profile2 = () => {
               ) : selectedTab === allCollabs ? (
                 <div className="app p-4">{allCollabs && allCollabs}</div>
               ) : selectedTab === "settings" ? (
-                <div className="flex flex-col p-4 gap-4 items-start">
-                  <label className="pl-4 text-purple-600 text-2xl">
-                    Edit Profile
-                  </label>
+                <div className="flex  py-12 gap-24  ">
+                  <MiniSideBar setSettingsComponent={setSettingsComponent} />
+                  {settingsComponent === "details" ? (
+                    <div className="flex flex-col gap-4 items-start visible">
+                      <input
+                        type="text"
+                        placeholder="New Name"
+                        className="bg-gray-700/50 w-full rounded-lg"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                      />
+                      <textarea
+                        placeholder="New Description"
+                        className="bg-gray-700/50 w-full rounded-lg"
+                        value={newDescription}
+                        onChange={(e) => setNewDescription(e.target.value)}
+                      ></textarea>
+                      <button
+                        className={
+                          loader === "info"
+                            ? "bg-gray-600 p-2 w-full rounded-lg"
+                            : "bg-purple-600 p-2 w-full rounded-lg"
+                        }
+                        onClick={(e) => handleUpdateProfile(e)}
+                        disabled={loader === "info"}
+                      >
+                        {loader === "info" ? "Loading..." : "Update Profile"}
+                      </button>
+                    </div>
+                  ) : (
+                    settingsComponent === "changePassword" && (
+                      <div className="flex flex-col p-4  gap-4 items-start visible">
+                        <input
+                          type="text"
+                          placeholder="New Password"
+                          className="bg-gray-700/50 w-full rounded-lg"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                        />
 
-                  <div className="flex flex-col p-4  gap-4 items-start visible">
-                    <input
-                      type="text"
-                      placeholder="New Name"
-                      className="bg-gray-700/50 w-full rounded-lg"
-                      value={newName}
-                      onChange={(e) => setNewName(e.target.value)}
-                    />
-                    <textarea
-                      placeholder="New Description"
-                      className="bg-gray-700/50 w-full rounded-lg"
-                      value={newDescription}
-                      onChange={(e) => setNewDescription(e.target.value)}
-                    ></textarea>
-                    <button
-                      className={
-                        loader === "info"
-                          ? "bg-gray-600 p-2 w-full rounded-lg"
-                          : "bg-purple-600 p-2 w-full rounded-lg"
-                      }
-                      onClick={(e) => handleUpdateProfile(e)}
-                      disabled={loader === "info"}
-                    >
-                      {loader === "info" ? "Loading..." : "Update Profile"}
-                    </button>
-                  </div>
-                  <div className="w-full">
-                    <button
-                      type="button"
-                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md float-right"
-                      onClick={() => {
-                        SessionService.clearUser();
-                        navigate("/");
-                      }}
-                    >
-                      Logout
-                    </button>
-                  </div>
+                        <button
+                          className={
+                            loader === "pass"
+                              ? "bg-gray-600 p-2 w-full rounded-lg"
+                              : "bg-purple-600 p-2 w-full rounded-lg"
+                          }
+                          onClick={(e) => handleUpdatePassword(e)}
+                          disabled={loader === "pass"}
+                        >
+                          {loader === "pass" ? "Loading..." : "Update Password"}
+                        </button>
+                      </div>
+                    )
+                  )}
                 </div>
               ) : (
                 <></>

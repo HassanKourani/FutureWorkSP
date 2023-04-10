@@ -5,6 +5,7 @@ import { db } from "../../Config";
 import Loading from "../../utils/Loading";
 import AccordionFolder from "../../utils/AccordionFolder";
 import { Accordion } from "@szhsin/react-accordion";
+import EmptyPage from "../../utils/EmptyPage";
 //import "../../Utils/AccordionFolder.module.css";
 
 const Materials = () => {
@@ -12,8 +13,8 @@ const Materials = () => {
   const [folders, setFolders] = useState();
   const foldersColRef = collection(db, "collaborations", uid, "folders");
   const [isLoading, setIsLoading] = useState(true);
-  const [searchedFolders, setSearchedFolders] = useState();
-  const [search, setSearch] = useState();
+  const [searchedFolders, setSearchedFolders] = useState([]);
+  const [search, setSearch] = useState([]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -93,22 +94,21 @@ const Materials = () => {
         <div className="flex justify-center">
           <Loading />
         </div>
-      ) : (
-        <div className="pr-4"></div>
-      )}
-
-      <div className="app pr-4">
-        <Accordion transition transitionTimeout={1000}>
-          {searchedFolders &&
-            searchedFolders.map((folder) => {
+      ) : searchedFolders && searchedFolders.length > 0 ? (
+        <div className="app pr-4">
+          <Accordion transition transitionTimeout={1000}>
+            {searchedFolders.map((folder) => {
               return (
                 <Fragment key={folder.id}>
                   <AccordionFolder folder={{ ...folder }} />
                 </Fragment>
               );
             })}
-        </Accordion>
-      </div>
+          </Accordion>
+        </div>
+      ) : (
+        <EmptyPage message={"No materials yet"} />
+      )}
     </>
   );
 };

@@ -46,7 +46,7 @@ function UsersSignUp() {
       "X-RapidAPI-Key": "6c813d40eemsh4b85bd226d7efc3p13fc54jsn57726975d5dd",
       "X-RapidAPI-Host": "rapidprod-sendgrid-v1.p.rapidapi.com",
     },
-    data: `{"personalizations":[{"to":[{"email":"${email}"}],"subject":"OLAA"}],"from":{"email":"noreply@seniorproject-cd393.firebaseapp.com"},"content":[{"type":"text/plain","value":"bruvv I'm tired. WORKKKK FFS, Take your damn Code:${randomNumber}"}]}`,
+    data: `{"personalizations":[{"to":[{"email":"${email}"}],"subject":"OLAA"}],"from":{"email":"noreply@seniorproject-cd393.firebaseapp.com"},"content":[{"type":"text/plain","value":"Hello! Thank you for signing up to collaborative learning. Please verify your account using this code: ${randomNumber}"}]}`,
   };
 
   const emailsQuery = query(

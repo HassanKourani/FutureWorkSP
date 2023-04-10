@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
@@ -87,8 +88,12 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
     discussionId,
     "comments"
   );
-  const q = query(commentsColRef, orderBy("createdAt", "desc"));
 
+  const q = query(
+    commentsColRef,
+    orderBy("isAnswer", "desc"),
+    orderBy("createdAt", "desc")
+  );
   const handleDeleteComment = (e, commentId) => {
     e.preventDefault();
     deleteDoc(
@@ -106,8 +111,13 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
 
   useEffect(() => {
     onSnapshot(q, (snapshot) => {
-      setAllComments(
-        snapshot.docs.map((comment) => {
+      const promises = snapshot.docs.map((comment) => {
+        return getDoc(doc(db, "users", comment.data().userId));
+      });
+
+      Promise.all(promises).then((users) => {
+        const comments = snapshot.docs.map((comment, index) => {
+          const user = users[index];
           return (
             <div key={comment.id}>
               {discussion && (
@@ -121,11 +131,11 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
                   <div className="flex items-center justify-between">
                     <div className="flex gap-4 items-center">
                       <img
-                        className="w-8 h-8 rounded-full "
-                        src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                        className="w-8 h-8 rounded-full object-cover"
+                        src={user.data().profile}
                         alt="user photo"
                       />
-                      <h1>{comment.data().userName}</h1>
+                      <h1>{user.data().name}</h1>
                     </div>
                     <div className="flex gap-4 items-center">
                       {comment.data().isAnswer &&
@@ -182,9 +192,11 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
               )}
             </div>
           );
-        })
-      );
-      setIsLoading(false);
+        });
+
+        setAllComments(comments);
+        setIsLoading(false);
+      });
     });
   }, [discussion]);
 
@@ -219,6 +231,7 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
               image: url,
               userId: user.id,
               userName: user.name,
+              isAnswer: false,
               createdAt: serverTimestamp(),
             }
           )
@@ -248,6 +261,8 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
           image: "",
           userId: user.id,
           userName: user.name,
+          isAnswer: false,
+
           createdAt: serverTimestamp(),
         }
       )
@@ -300,33 +315,59 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
                   >
                     {isLoading ? "Loading..." : "Post comment"}
                   </button>
-                  <div className="flex pl-0 space-x-1 sm:pl-2">
-                    <label
-                      htmlFor="image"
-                      className="inline-flex items-center justify-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
-                    >
-                      {image ? "attached" : ""}
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
+                  <div className=" flex items-center">
+                    {img && (
+                      <label
+                        className="flex items-center"
+                        onClick={() => {
+                          setImg("");
+                          setImage("");
+                        }}
                       >
-                        <path
-                          fillRule="evenodd"
-                          d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
-                          clipRule="evenodd"
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-5 h-5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </label>
+                    )}
+                    <div className="flex pl-0 space-x-1 sm:pl-2">
+                      <label
+                        htmlFor="image"
+                        className="inline-flex items-center justify-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
+                      >
+                        {image ? "attached" : ""}
+                        <svg
+                          aria-hidden="true"
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <input
+                          type="file"
+                          id="image"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleAddImage}
                         />
-                      </svg>
-                      <input
-                        type="file"
-                        id="image"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleAddImage}
-                      />
-                    </label>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>

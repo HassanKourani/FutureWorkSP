@@ -9,7 +9,7 @@ function Footer() {
           {/* Top area: Blocks */}
           <div className="grid md:grid-cols-12 gap-8 lg:gap-20 mb-8 md:mb-12">
             {/* 1st block */}
-            <div className="md:col-span-4 lg:col-span-5">
+            <div className="md:col-span-12 lg:col-span-12">
               <div className="mb-2">
                 {/* Logo */}
                 <Link to="/" className="inline-block" aria-label="Cruip">
@@ -23,9 +23,16 @@ function Footer() {
                 </Link>
               </div>
               <div className="text-gray-400">
-                Lorem ipsum is placeholder text commonly used in the graphic,
-                print, and publishing industries for previewing layouts and
-                visual mockups.
+                Collaborative learning website is an innovative platform that
+                offers students a variety of features to connect, collaborate,
+                and learn in a supportive environment. With its cutting-edge
+                tools and resources, the platform empowers learners to achieve
+                their academic goals and unlock their full potential. Whether
+                you're looking to connect with other students, share study
+                materials, schedule virtual meetings, or collaborate on
+                projects, our platform has everything you need to enhance your
+                learning experience. Join our community of learners today and
+                discover a new way to learn that is both effective and engaging!
               </div>
             </div>
           </div>
@@ -33,7 +40,7 @@ function Footer() {
           {/* Bottom area */}
           <div className="md:flex md:items-center md:justify-between">
             {/* Social links */}
-            <ul className="flex mb-4 md:order-1 md:ml-4 md:mb-0">
+            {/* <ul className="flex mb-4 md:order-1 md:ml-4 md:mb-0">
               <li>
                 <Link
                   to="#"
@@ -111,7 +118,7 @@ function Footer() {
                   </svg>
                 </Link>
               </li>
-            </ul>
+            </ul> */}
 
             {/* Copyrights note */}
             <div className="text-gray-400 text-sm mr-4">

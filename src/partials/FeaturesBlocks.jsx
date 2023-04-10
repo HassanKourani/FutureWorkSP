@@ -8,7 +8,7 @@ function FeaturesBlocks() {
           {/* Section header */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
             <h2 className="h2 mb-4">
-              The majority learners dont have a clear path!
+              The majority of learners dont have a clear path!
             </h2>
             <p className="text-xl text-gray-400">
               Here are some feature the we offer you
@@ -21,7 +21,7 @@ function FeaturesBlocks() {
             data-aos-id-blocks
           >
             {/* 1st item */}
-            <div
+            {/* <div
               className="relative flex flex-col items-center"
               data-aos="fade-up"
               data-aos-anchor="[data-aos-id-blocks]"
@@ -58,7 +58,7 @@ function FeaturesBlocks() {
                 their professors based on their experiences in the class,
                 providing helpful insights for future students.
               </p>
-            </div>
+            </div> */}
 
             {/* 2nd item */}
             <div

@@ -1,6 +1,7 @@
 import Footer from "../../partials/Footer";
 import { SessionService } from "../../SessionService";
 import MainHeader from "./MainHeader";
+import EmptyPage from "../../utils/EmptyPage";
 import "./Main.css";
 import { Fragment, useEffect, useState } from "react";
 import { db } from "../../Config";
@@ -103,7 +104,7 @@ const Main = () => {
           <div className="pt-32 pb-12 md:pt-40 md:pb-20 sm:w-3/4">
             {!pending ? (
               <div className="grid grid-cols-2 gap-4 mx-10 sm:gird-cols-3 md:grid-cols-3 lg:grid-cols-4">
-                {searchedCollabs &&
+                {searchedCollabs && searchedCollabs.length > 0 ? (
                   searchedCollabs.map((collab) => (
                     <div
                       key={collab.id}
@@ -117,7 +118,12 @@ const Main = () => {
                     >
                       <FancyCard collab={{ ...collab.data(), id: collab.id }} />
                     </div>
-                  ))}
+                  ))
+                ) : (
+                  <div className="flex justify-center col-span-full">
+                    <EmptyPage message={"No collabs yet"} />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex justify-center items-center mt-20 ">

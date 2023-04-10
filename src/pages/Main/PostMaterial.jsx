@@ -41,9 +41,11 @@ const PostMaterial = () => {
     if (files.length !== 0) {
       addDoc(collection(db, "collaborations", uid, "folders"), {
         folderName: title,
+        userId: user.id,
       }).then((res) => {
         addDoc(collection(db, "users", user.id, "folders"), {
           folderName: title,
+          userId: user.id,
         }).then((userRes) => {
           let i = 1;
           Array.from(files).map((file) => {

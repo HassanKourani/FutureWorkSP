@@ -8,6 +8,10 @@ const Tabs = ({ handleTabSelect, isUserProfile }) => {
           <input type="radio" name="radio" defaultChecked />
           <span className="name">Discussions</span>
         </label>
+        <label className="radio" onClick={() => handleTabSelect("collabs")}>
+          <input type="radio" name="radio" />
+          <span className="name">Collabs</span>
+        </label>
         <label className="radio" onClick={() => handleTabSelect("materials")}>
           <input type="radio" name="radio" />
           <span className="name">Materials</span>

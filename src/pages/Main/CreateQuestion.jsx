@@ -49,6 +49,7 @@ const CreateQuestion = ({ setCurrentComponent }) => {
               addDoc(collection(db, "users", user.id, "discussions"), {
                 collabId: uid,
                 discId: res.id,
+                createdAt: serverTimestamp(),
               }).catch((err) => {
                 console.log(err);
                 setIsLoading(false);
@@ -78,6 +79,7 @@ const CreateQuestion = ({ setCurrentComponent }) => {
           addDoc(collection(db, "users", user.id, "discussions"), {
             collabId: uid,
             discId: res.id,
+            createdAt: serverTimestamp(),
           }).catch((err) => {
             console.log(err);
             setIsLoading(false);
@@ -121,6 +123,30 @@ const CreateQuestion = ({ setCurrentComponent }) => {
                 {isLoading ? "Loading..." : "Post question"}
               </button>
               <div className="flex pl-0 space-x-1 sm:pl-2">
+                {img && (
+                  <label
+                    className="flex items-center"
+                    onClick={() => {
+                      setImg("");
+                      setImage("");
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </label>
+                )}
                 <label
                   htmlFor="image"
                   className="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
@@ -156,8 +182,8 @@ const CreateQuestion = ({ setCurrentComponent }) => {
         <div className="flex items-center justify-between">
           <div className="flex gap-4 items-center">
             <img
-              className="w-8 h-8 rounded-full "
-              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+              className="w-8 h-8 rounded-full object-cover"
+              src={user.profile}
               alt="user photo"
             />
             <h1>{user.name}</h1>

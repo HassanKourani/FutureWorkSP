@@ -15,6 +15,7 @@ import Collaboration from "./pages/Main/Collaboration";
 import Profile from "./pages/Profile/Profile";
 import Meeting from "./pages/Meetings/Meeting";
 import Profile2 from "./pages/Profile/Profile2";
+import Page404 from "./pages/Page404";
 
 function App() {
   const location = useLocation();
@@ -37,7 +38,7 @@ function App() {
   return (
     <>
       <Routes>
-        <Route exact path="/" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/signin" element={<UsersSignIn />} />
         <Route path="/signup" element={<UsersSignUp />} />
         <Route path="/main" element={<Main />} />
@@ -46,8 +47,7 @@ function App() {
         {/* <Route path="/profile" element={<Profile />} /> */}
         <Route path="/profile/:userId" element={<Profile2 />} />
         <Route path="/main/:uid/:mid" element={<Meeting />} />
-
-        {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
+        <Route path="*" element={<Page404 />} />
       </Routes>
     </>
   );

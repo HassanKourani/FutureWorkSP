@@ -25,11 +25,6 @@ const Discussions = ({ setCurrentComponent }) => {
       />
     );
   };
-  //  <QuestionCard
-  //    question={discussion.data()}
-  //    key={discussion.id}
-  //    onClick={(e) => handleOnClick(e, discussion)}
-  //  />;
 
   useEffect(() => {
     setIsLoading(true);

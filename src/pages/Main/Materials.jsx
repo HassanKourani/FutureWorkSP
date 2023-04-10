@@ -5,7 +5,7 @@ import { db } from "../../Config";
 import Loading from "../../utils/Loading";
 import AccordionFolder from "../../utils/AccordionFolder";
 import { Accordion } from "@szhsin/react-accordion";
-import "../../Utils/AccordionFolder.module.css";
+//import "../../Utils/AccordionFolder.module.css";
 
 const Materials = () => {
   const uid = useParams().uid;

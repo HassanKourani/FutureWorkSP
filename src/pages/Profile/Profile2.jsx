@@ -7,6 +7,8 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  orderBy,
+  query,
   updateDoc,
 } from "firebase/firestore";
 import { db, storage } from "../../Config";
@@ -21,6 +23,7 @@ const Profile2 = () => {
   const user = SessionService.getUser();
   const [updatedUser, setUpdatedUser] = useState();
   const [allDiscs, setAllDiscs] = useState();
+  const [allCollabs, setAllCollabs] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState();
   const [folders, setFolders] = useState();
@@ -35,8 +38,12 @@ const Profile2 = () => {
   const navigate = useNavigate();
   const uid = useParams().userId;
 
-  const discColRef = collection(db, "users", uid, "discussions");
+  const discColRef = query(
+    collection(db, "users", uid, "discussions"),
+    orderBy("createdAt", "desc")
+  );
   const foldersColRef = collection(db, "users", uid, "folders");
+  const collabsColRef = collection(db, "users", uid, "collabs");
 
   const isUserProfile = () => {
     return user.id === uid;
@@ -139,11 +146,21 @@ const Profile2 = () => {
       });
     });
   };
+  const handleGoToCollab = (e, collabId) => {
+    getDoc(doc(db, "collaborations", collabId)).then((collab) => {
+      navigate(`/main/${collabId}`, {
+        state: {
+          collabName: collab.data().title,
+        },
+      });
+    });
+  };
 
   const handleTabSelect = (selected) => {
     if (selected === "discussions") setSelectedTab(allDiscs);
     else if (selected === "materials") setSelectedTab(folders);
     else if (selected === "settings") setSelectedTab("settings");
+    else if (selected === "collabs") setSelectedTab(allCollabs);
   };
 
   useEffect(() => {
@@ -191,6 +208,41 @@ const Profile2 = () => {
                   </h1>
                 </div>
                 <h1>{disc.question}</h1>
+              </div>
+            );
+          })
+        );
+        setIsLoading(false);
+      });
+    });
+
+    onSnapshot(collabsColRef, (snapshot) => {
+      Promise.all(
+        snapshot.docs.map((collabInfo) => {
+          return getDoc(doc(db, "collaborations", collabInfo.id)).then(
+            (res) => {
+              return {
+                ...res.data(),
+                id: res.id,
+              };
+            }
+          );
+        })
+      ).then((allValues) => {
+        console.log(allValues);
+        setAllCollabs(
+          allValues.map((collab) => {
+            return (
+              <div
+                className="py-2 px-4 m-1 bg-gray-800/50 hover:bg-gray-700/50 cursor-pointer"
+                key={collab.id}
+                onClick={(e) => handleGoToCollab(e, collab.id)}
+              >
+                <div className="flex flex-col">
+                  <h1>{collab.title}</h1>
+
+                  <h1>{collab.description}</h1>
+                </div>
               </div>
             );
           })
@@ -377,6 +429,8 @@ const Profile2 = () => {
                 </div>
               ) : selectedTab === allDiscs ? (
                 <div className="app p-4">{allDiscs && allDiscs}</div>
+              ) : selectedTab === allCollabs ? (
+                <div className="app p-4">{allCollabs && allCollabs}</div>
               ) : selectedTab === "settings" ? (
                 <div className="flex flex-col p-4 gap-4 items-start">
                   <label className="pl-4 text-purple-600 text-2xl">

@@ -1,6 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConfirmationModal from "./ConfirmationModal";
-import { deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import { useParams } from "react-router-dom";
 import Discussions from "../pages/Main/Discussions";
 import { db } from "../Config";
@@ -8,13 +16,14 @@ import { SessionService } from "../SessionService";
 
 const QuestionCard = ({ question, onClick, setCurrentComponent }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [profile, setProfile] = useState();
+  const [userName, setUserName] = useState();
 
   const uid = useParams().uid;
   const user = SessionService.getUser();
   //console.log(user.id, question.userId);
   const handleConfirmDeleteModal = (e) => {
     e.preventDefault();
-
     deleteDoc(doc(db, "collaborations", uid, "discussions", question.id)).then(
       () => {
         setCurrentComponent(
@@ -22,7 +31,23 @@ const QuestionCard = ({ question, onClick, setCurrentComponent }) => {
         );
       }
     );
+    getDocs(
+      query(
+        collection(db, "users", user.id, "discussions"),
+        where("discId", "==", question.id)
+      )
+    ).then((disc) =>
+      deleteDoc(doc(db, "users", user.id, "discussions", disc.docs[0].id))
+    );
   };
+
+  useEffect(() => {
+    getDoc(doc(db, "users", question.userId)).then((user) => {
+      setProfile(user.data().profile);
+      setUserName(user.data().name);
+    });
+  }, []);
+
   return (
     <>
       <div
@@ -31,12 +56,14 @@ const QuestionCard = ({ question, onClick, setCurrentComponent }) => {
       >
         <div className="flex items-center justify-between">
           <div className="flex gap-4 items-center">
-            <img
-              className="w-8 h-8 rounded-full "
-              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-              alt="user photo"
-            />
-            <h1>{question.userName}</h1>
+            {profile && (
+              <img
+                className="w-8 h-8 rounded-full object-cover"
+                src={profile}
+                alt="user photo"
+              />
+            )}
+            <h1>{userName}</h1>
           </div>
           <div className="flex gap-4">
             {question.createdAt && (

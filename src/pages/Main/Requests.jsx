@@ -3,11 +3,12 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   onSnapshot,
   setDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { db } from "../../Config";
 import Loading from "../../utils/Loading";
 
@@ -15,23 +16,29 @@ const Requests = () => {
   const uid = useParams().uid;
   const [requests, setRequests] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const { state } = useLocation();
+  const { collabName } = state;
 
   useEffect(() => {
     setIsLoading(true);
     onSnapshot(
       collection(db, "collaborations", uid, "requests"),
-      (snapshot) => {
-        setRequests(
-          snapshot.docs.map((request) => (
+      async (snapshot) => {
+        const requestPromises = snapshot.docs.map(async (request) => {
+          const user = await getDoc(
+            doc(db, "users", request.data().requestedId)
+          );
+
+          return (
             <div key={request.id}>
               <div className="flex items-center justify-between">
                 <div className="flex gap-4 items-center">
                   <img
-                    className="w-8 h-8 rounded-full "
-                    src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                    className="w-8 h-8 rounded-full object-cover"
+                    src={user.data().profile}
                     alt="user photo"
                   />
-                  <h1>{request.data().requestedName}</h1>
+                  <h1>{user.data().name}</h1>
                 </div>
                 <div className="flex items-centers gap-2 pr-4">
                   <button
@@ -49,8 +56,11 @@ const Requests = () => {
                 </div>
               </div>
             </div>
-          ))
-        );
+          );
+        });
+
+        const requestComponents = await Promise.all(requestPromises);
+        setRequests(requestComponents);
         setIsLoading(false);
       }
     );
@@ -66,6 +76,9 @@ const Requests = () => {
         userName: request.data().requestedName,
       }
     );
+    setDoc(doc(db, "users", request.data().requestedId, "collabs", uid), {
+      collabName: collabName,
+    });
     deleteDoc(doc(db, "collaborations", uid, "requests", request.id));
   };
 

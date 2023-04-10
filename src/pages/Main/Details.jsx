@@ -47,7 +47,6 @@ const Details = () => {
           })
         )
       ).then((usersList) => {
-        console.log(usersList);
         Promise.all(
           usersList.map((e) => {
             return getDoc(doc(db, "users", e.id)).then((res) => {

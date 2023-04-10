@@ -7,6 +7,7 @@ import {
   getDocs,
   onSnapshot,
   query,
+  setDoc,
   where,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -116,13 +117,14 @@ const Collaboration = () => {
     );
   }, []);
 
-  const handleUserState = () => {
+  const handleUserStatePrivate = () => {
     if (isJoined) {
       // leave
 
       deleteDoc(doc(db, "collaborations", uid, "users", user.id)).then(() =>
         navigate("/main")
       );
+      deleteDoc(doc(db, "users", user.id, "collabs", uid));
     } else {
       // request
       if (!isRequested) {
@@ -134,6 +136,27 @@ const Collaboration = () => {
       }
     }
   };
+  const handleUserStatePublic = () => {
+    if (isJoined) {
+      // leave
+
+      deleteDoc(doc(db, "collaborations", uid, "users", user.id)).then(() =>
+        navigate("/main")
+      );
+      deleteDoc(doc(db, "users", user.id, "collabs", uid));
+    } else {
+      // Join
+
+      setDoc(doc(db, "collaborations", uid, "users", user.id), {
+        userName: user.name,
+      });
+
+      setDoc(doc(db, "users", user.id, "collabs", uid), {
+        collabName: collabName,
+      });
+    }
+  };
+
   const handleColDelete = () => {
     deleteDoc(doc(db, "collaborations", uid)).then(() => navigate("/main"));
   };
@@ -478,7 +501,7 @@ const Collaboration = () => {
                 <li>
                   <div
                     className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                    onClick={() => handleUserState()}
+                    onClick={() => handleUserStatePrivate()}
                   >
                     <span className="flex-1  whitespace-nowrap">
                       <button
@@ -494,6 +517,27 @@ const Collaboration = () => {
                           : isRequested
                           ? "Requested"
                           : "Request"}
+                      </button>
+                    </span>
+                  </div>
+                </li>
+              )}
+              {!isPrivate && !isAdmin && (
+                <li>
+                  <div
+                    className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => handleUserStatePublic()}
+                  >
+                    <span className="flex-1  whitespace-nowrap">
+                      <button
+                        type="submit"
+                        className={
+                          isRequested
+                            ? "text-white w-full bg-gray-500   font-medium rounded-lg text-sm px-4 py-2  "
+                            : "text-white w-full bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800"
+                        }
+                      >
+                        {isJoined ? "Leave" : "Join"}
                       </button>
                     </span>
                   </div>

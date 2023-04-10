@@ -5,6 +5,7 @@ import { db } from "../../Config";
 import Loading from "../../utils/Loading";
 import QuestionCard from "../../utils/QuestionCard";
 import Discussion from "./Discussion";
+import EmptyPage from "../../utils/EmptyPage";
 
 const Discussions = ({ setCurrentComponent }) => {
   const uid = useParams().uid;
@@ -13,7 +14,7 @@ const Discussions = ({ setCurrentComponent }) => {
   const discussionColRef = collection(db, "collaborations", uid, "discussions");
   const q = query(discussionColRef, orderBy("createdAt", "desc"));
   const [isLoading, setIsLoading] = useState(true);
-  const [searchedDiscussions, setSearchedDiscussions] = useState();
+  const [searchedDiscussions, setSearchedDiscussions] = useState([]);
   const [search, setSearch] = useState();
 
   const handleOnClick = (e, discussion) => {
@@ -107,18 +108,23 @@ const Discussions = ({ setCurrentComponent }) => {
         </div>
       )}
       {/* {searchedDiscussions} */}
-      <div className="pb-20 sm:pb-0">
-        {searchedDiscussions &&
-          searchedDiscussions.map((discussion) => {
-            return (
-              <QuestionCard
-                question={discussion}
-                key={discussion.id}
-                onClick={(e) => handleOnClick(e, discussion)}
-              />
-            );
-          })}
-      </div>
+      {!isLoading && (
+        <div className="pb-20 sm:pb-0">
+          {searchedDiscussions && searchedDiscussions.length > 0 ? (
+            searchedDiscussions.map((discussion) => {
+              return (
+                <QuestionCard
+                  question={discussion}
+                  key={discussion.id}
+                  onClick={(e) => handleOnClick(e, discussion)}
+                />
+              );
+            })
+          ) : (
+            <EmptyPage message={"No discussions yet"} />
+          )}
+        </div>
+      )}
     </>
   );
 };

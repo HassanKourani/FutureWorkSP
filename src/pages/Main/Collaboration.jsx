@@ -184,22 +184,27 @@ const Collaboration = () => {
               <div className="flex items-center">
                 <div className="flex items-center ml-3">
                   <div>
-                    <button
-                      type="button"
-                      className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                      aria-expanded="false"
-                      data-dropdown-toggle="dropdown-user"
+                    <Link
+                      to={`/profile/${user.id}`}
+                      className="flex font-medium w-full text-purple-600 hover:text-gray-200 py-2 justify-center"
                     >
-                      <img
-                        className="w-8 h-8 rounded-full object-cover"
-                        src={
-                          user.profile
-                            ? user.profile
-                            : "https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                        }
-                        alt="user photo"
-                      />
-                    </button>
+                      <button
+                        type="button"
+                        className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                        aria-expanded="false"
+                        data-dropdown-toggle="dropdown-user"
+                      >
+                        <img
+                          className="w-8 h-8 rounded-full object-cover"
+                          src={
+                            user.profile
+                              ? user.profile
+                              : "https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                          }
+                          alt="user photo"
+                        />
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>

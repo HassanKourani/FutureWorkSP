@@ -432,6 +432,7 @@ const Profile2 = () => {
               <Tabs
                 handleTabSelect={handleTabSelect}
                 isUserProfile={isUserProfile}
+                setSettingsComponent={setSettingsComponent}
               />
 
               {selectedTab === folders ? (
@@ -446,7 +447,6 @@ const Profile2 = () => {
                 <div className="app p-4">{allCollabs && allCollabs}</div>
               ) : selectedTab === "settings" ? (
                 <div className="flex  py-12 gap-24  ">
-                  <MiniSideBar setSettingsComponent={setSettingsComponent} />
                   {settingsComponent === "details" ? (
                     <div className="flex flex-col gap-4 items-start visible">
                       <input
@@ -475,7 +475,7 @@ const Profile2 = () => {
                       </button>
                     </div>
                   ) : (
-                    settingsComponent === "changePassword" && (
+                    settingsComponent === "password" && (
                       <div className="flex flex-col p-4  gap-4 items-start visible">
                         <input
                           type="text"

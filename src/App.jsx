@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 
 import "aos/dist/aos.css";
 import "./css/style.css";
+import("preline");
 
 import AOS from "aos";
 

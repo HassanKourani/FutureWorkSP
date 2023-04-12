@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { SessionService } from "../../SessionService";
 import {
   collection,
   deleteDoc,
   doc,
   getDoc,
-  getDocs,
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../Config";
 import Switch from "../../utils/Switch";
 import ConfirmationModal from "../../utils/ConfirmationModal";
+import MobileBurger from "../../utils/MobileBurger";
 
-const Details = () => {
+const Details = ({ handleBurgerClick }) => {
   const uid = useParams().uid;
   const [usersId, setUsersId] = useState([]);
   const [users, setUsers] = useState();
@@ -22,6 +22,9 @@ const Details = () => {
   const [collab, setCollab] = useState();
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(false);
+  const [isBurgerOpen, setIsBurgerOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getDoc(doc(db, "collaborations", uid)).then((res) => {
@@ -69,15 +72,45 @@ const Details = () => {
     });
   };
 
+  const handleColDelete = () => {
+    deleteDoc(doc(db, "collaborations", uid)).then(() => navigate("/main"));
+  };
+
   return (
     <>
+      {isBurgerOpen && (
+        <div className="h-28 w-full fixed bg-purple-500 top-28 z-50 sm:hidden">
+          <div className="flex flex-col gap-1 p-4">
+            <button
+              className="focus:bg-purple-400 p-2 border-b"
+              onClick={() => handleBurgerClick("requests")}
+            >
+              Requests
+            </button>
+            <button
+              className="focus:bg-purple-400 p-2"
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
+              Delete Collab
+            </button>
+          </div>
+        </div>
+      )}
       {collab && (
-        <div className="flex justify-between px-4">
-          <h2 className="text-purple-500 text-2xl font-bold">
-            {collab.description}
-          </h2>
+        <div className="flex flex-col sm:flex-row sm:justify-between items-center px-4">
+          <div className="flex justify-between items-center w-full ">
+            <h2 className="text-purple-500 text-2xl font-bold">
+              {collab.description}
+            </h2>
+            <div className="sm:hidden">
+              <MobileBurger
+                setIsBurgerOpen={setIsBurgerOpen}
+                isBurgerOpen={isBurgerOpen}
+              />
+            </div>
+          </div>
           {user.id === collab.uid ? (
-            <div className=" flex gap-2 items-center ">
+            <div className=" flex gap-2 items-center col-span-2">
               <label className=" ">Public</label>
               <Switch isPrivate={isPrivate} setIsPrivate={setIsPrivate} />
               <label className="">Private</label>
@@ -185,6 +218,11 @@ const Details = () => {
         isOpen={isConfirmationModalOpen}
         setIsOpen={setIsConfirmationModalOpen}
         onClick={() => handleRemoveUser()}
+      />
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        setIsOpen={setIsDeleteModalOpen}
+        onClick={() => handleColDelete()}
       />
     </>
   );

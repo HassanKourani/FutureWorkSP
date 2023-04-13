@@ -1,7 +1,12 @@
 import Dropdown from "./Dropdown";
 import "./Tabs.css";
 
-const Tabs = ({ handleTabSelect, isUserProfile, setSettingsComponent }) => {
+const Tabs = ({
+  handleTabSelect,
+  isUserProfile,
+  setSettingsComponent,
+  settingsComponent,
+}) => {
   return (
     <>
       <div className="radio-inputs m-auto">
@@ -18,11 +23,11 @@ const Tabs = ({ handleTabSelect, isUserProfile, setSettingsComponent }) => {
           <span className="name">Materials</span>
         </label>
         {isUserProfile() && (
-          <label
-            className="radio flex items-center"
-            onClick={() => handleTabSelect("settings")}
-          >
-            <Dropdown setSettingsComponent={setSettingsComponent} />
+          <label className="radio flex items-center">
+            <Dropdown
+              setSettingsComponent={setSettingsComponent}
+              handleTabSelect={handleTabSelect}
+            />
           </label>
         )}
       </div>

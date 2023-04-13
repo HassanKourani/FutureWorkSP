@@ -32,6 +32,9 @@ function CreateCollab() {
       title: title,
     }).then((res) => {
       const usersColRef = doc(db, "collaborations", res.id, "users", user.id);
+      setDoc(doc(db, "users", user.id, "collabs", res.id), {
+        collabName: title,
+      });
       setDoc(usersColRef, { userId: user.id }).then(() => navigate("/main"));
     });
   };

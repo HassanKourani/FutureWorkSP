@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { SessionService } from "../SessionService";
 import "./Tabs.css";
 
-const Dropdown = ({ setSettingsComponent }) => {
+const Dropdown = ({ setSettingsComponent, handleTabSelect }) => {
   const navigate = useNavigate();
 
   return (
     <>
-      <div className="hs-dropdown relative inline-flex  m-auto">
+      <div className="hs-dropdown relative inline-flex m-auto">
         <button
           id="hs-dropdown-custom-icon-trigger"
           type="button"
@@ -26,22 +26,28 @@ const Dropdown = ({ setSettingsComponent }) => {
           </svg>
         </button>
         <div
-          className="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden mt-2 min-w-[15rem] bg-white shadow-md rounded-lg p-2 mt-2 dark:bg-gray-800 dark:border dark:border-gray-700"
+          className="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-[15rem] shadow-md rounded-lg p-2 mt-2 bg-gray-800 dark:border dark:border-gray-700"
           aria-labelledby="hs-dropdown-custom-icon-trigger"
         >
           <label
             className="radio"
-            onClick={() => setSettingsComponent("details")}
+            onClick={() => {
+              setSettingsComponent("details");
+              handleTabSelect("settings");
+            }}
           >
             <input type="radio" name="radio" />
-            <span className="name">Details</span>
+            <span className="name hover:bg-gray-600">Details</span>
           </label>
           <label
             className="radio"
-            onClick={() => setSettingsComponent("password")}
+            onClick={() => {
+              setSettingsComponent("password");
+              handleTabSelect("settings");
+            }}
           >
             <input type="radio" name="radio" />
-            <span className="name">Update Password</span>
+            <span className="name hover:bg-gray-600 my-2">Update Password</span>
           </label>
           <label
             className="radio"
@@ -51,7 +57,7 @@ const Dropdown = ({ setSettingsComponent }) => {
             }}
           >
             <input type="radio" name="radio" />
-            <span className="name">Logout</span>
+            <span className="name hover:bg-red-600">Logout</span>
           </label>
         </div>
       </div>

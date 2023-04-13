@@ -433,6 +433,7 @@ const Profile2 = () => {
                 handleTabSelect={handleTabSelect}
                 isUserProfile={isUserProfile}
                 setSettingsComponent={setSettingsComponent}
+                settingsComponent={settingsComponent}
               />
 
               {selectedTab === folders ? (

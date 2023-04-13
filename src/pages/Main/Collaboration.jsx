@@ -159,6 +159,7 @@ const Collaboration = () => {
 
   const handleColDelete = () => {
     deleteDoc(doc(db, "collaborations", uid)).then(() => navigate("/main"));
+    deleteDoc(doc(db, "users", user.id, "collabs", uid));
   };
 
   return (

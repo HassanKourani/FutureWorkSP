@@ -13,7 +13,7 @@ import Switch from "../../utils/Switch";
 import ConfirmationModal from "../../utils/ConfirmationModal";
 import MobileBurger from "../../utils/MobileBurger";
 
-const Details = ({ handleBurgerClick }) => {
+const Details = ({ handleBurgerClick, isAdmin }) => {
   const uid = useParams().uid;
   const [usersId, setUsersId] = useState([]);
   const [users, setUsers] = useState();
@@ -78,8 +78,8 @@ const Details = ({ handleBurgerClick }) => {
 
   return (
     <>
-      {isBurgerOpen && (
-        <div className="h-28 w-full fixed bg-purple-500 top-28 z-50 sm:hidden">
+      {isBurgerOpen && isAdmin && (
+        <div className="h-28 left-10 w-4/5 fixed bg-purple-500 top-28 z-50 sm:hidden">
           <div className="flex flex-col gap-1 p-4">
             <button
               className="focus:bg-purple-400 p-2 border-b"
@@ -102,12 +102,14 @@ const Details = ({ handleBurgerClick }) => {
             <h2 className="text-purple-500 text-2xl font-bold">
               {collab.description}
             </h2>
-            <div className="sm:hidden">
-              <MobileBurger
-                setIsBurgerOpen={setIsBurgerOpen}
-                isBurgerOpen={isBurgerOpen}
-              />
-            </div>
+            {isAdmin && (
+              <div className="sm:hidden">
+                <MobileBurger
+                  setIsBurgerOpen={setIsBurgerOpen}
+                  isBurgerOpen={isBurgerOpen}
+                />
+              </div>
+            )}
           </div>
           {user.id === collab.uid ? (
             <div className=" flex gap-2 items-center col-span-2">

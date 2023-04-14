@@ -78,7 +78,9 @@ const Collaboration = () => {
       setCurrentComponent(<Meetings />);
     }
     if (component == "details") {
-      setCurrentComponent(<Details handleBurgerClick={handleSidebarClick} />);
+      setCurrentComponent(
+        <Details handleBurgerClick={handleSidebarClick} isAdmin={isAdmin} />
+      );
     }
     setCurrentComponentName(component);
   };

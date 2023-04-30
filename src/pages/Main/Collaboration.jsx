@@ -257,27 +257,111 @@ const Collaboration = () => {
               </svg>
             </button>
             {/* -----Third Icon Add btn----- */}
-            <div className="flex items-center justify-center">
-              <button
-                data-tooltip-target="tooltip-new"
-                type="button"
-                className="inline-flex items-center justify-center w-10 h-10 font-medium bg-purple-600 rounded-full hover:bg-purple-700 group focus:ring-4 focus:ring-purple-300 focus:outline-none dark:focus:ring-purple-800"
-              >
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
+            {(isJoined || !isPrivate) &&
+              (currentComponentName == "discussions" ||
+                currentComponentName == "materials" ||
+                currentComponentName == "meetings") && (
+                <div className="flex items-center justify-center">
+                  <button
+                    data-tooltip-target="tooltip-new"
+                    type="button"
+                    className="inline-flex items-center justify-center w-10 h-10 font-medium bg-purple-600 rounded-full hover:bg-purple-700 group focus:ring-4 focus:ring-purple-300 focus:outline-none dark:focus:ring-purple-800"
+                    onClick={() => handleSidebarPost()}
+                  >
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        fillRule="evenodd"
+                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            {isJoined && !isAdmin && currentComponentName == "details" && (
+              <div className="flex items-center justify-center">
+                <button
+                  data-tooltip-target="tooltip-new"
+                  type="button"
+                  className="inline-flex items-center justify-center w-10 h-10 font-medium bg-red-600 rounded-full hover:bg-red-700 group focus:ring-4 focus:ring-red-300 focus:outline-none dark:focus:ring-red-800"
+                  onClick={() => handleUserStatePrivate()}
                 >
-                  <path
-                    clipRule="evenodd"
-                    fillRule="evenodd"
-                    d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                  />
-                </svg>
-              </button>
-            </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
+            {(isJoined || !isPrivate) &&
+              isAdmin &&
+              (currentComponentName == "details" ||
+                currentComponentName == "requests") && (
+                <div className="flex items-center justify-center">
+                  <button
+                    data-tooltip-target="tooltip-new"
+                    type="button"
+                    className="inline-flex items-center justify-center w-10 h-10 font-medium bg-red-600 rounded-full hover:bg-red-700 group focus:ring-4 focus:ring-red-300 focus:outline-none dark:focus:ring-red-800"
+                    onClick={() => setIsDeleteModalOpen(true)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            {!isJoined && isPrivate && (
+              <div className="flex items-center justify-center">
+                <button
+                  data-tooltip-target="tooltip-new"
+                  type="button"
+                  className="inline-flex items-center justify-center w-10 h-10 font-medium bg-purple-600 rounded-full hover:bg-purple-700 group focus:ring-4 focus:ring-purple-300 focus:outline-none dark:focus:ring-purple-800"
+                  onClick={() => handleUserStatePrivate()}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
             {/* -----Fourth Icon----- */}
             <button
               data-tooltip-target="tooltip-wallet"
@@ -298,7 +382,6 @@ const Collaboration = () => {
                 />
               </svg>
             </button>
-
             {/* -----fifth Icon----- */}
             <button
               data-tooltip-target="tooltip-settings"

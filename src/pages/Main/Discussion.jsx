@@ -59,6 +59,17 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
       ),
       { isAnswer: true }
     );
+
+    if (user.id != discussion.userId) {
+      addDoc(collection(db, "users", discussion.userId, "notifications"), {
+        message: `${user.name} selected your comment as the answer.`,
+        type: "answer",
+        discussionId: discussionId,
+        collabId: uid,
+        createdAt: serverTimestamp(),
+        opened: false,
+      });
+    }
   };
   const handleRemoveAnswer = (e, commentId) => {
     e.preventDefault();
@@ -274,6 +285,17 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
           console.log(err);
           setIsLoading(false);
         });
+    }
+
+    if (user.id != discussion.userId) {
+      addDoc(collection(db, "users", discussion.userId, "notifications"), {
+        message: `${user.name} commented on your discussion ${comment}`,
+        type: "comment",
+        discussionId: discussionId,
+        createdAt: serverTimestamp(),
+        collabId: uid,
+        opened: false,
+      });
     }
   };
 

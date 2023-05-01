@@ -7,6 +7,7 @@ import {
   getDocs,
   onSnapshot,
   query,
+  serverTimestamp,
   setDoc,
   where,
 } from "firebase/firestore";
@@ -45,21 +46,26 @@ const Collaboration = () => {
     useState(false);
   const [requestsCount, setRequestsCount] = useState("0");
   const { state } = useLocation();
-  const { collabName, discId = null } = state;
+  const { collabName, discId = null, request = null, detail = null } = state;
+  const [adminId, setAdminId] = useState();
 
   useEffect(() => {
-    if (!discId) {
-      setCurrentComponent(
-        <Discussions setCurrentComponent={setCurrentComponent} />
-      );
-    } else {
+    if (discId) {
       setCurrentComponent(
         <Discussion
           discussionId={discId}
           setCurrentComponent={setCurrentComponent}
         />
       );
-    }
+    } else if (request) setCurrentComponent(<Requests />);
+    else if (detail)
+      setCurrentComponent(
+        <Details handleBurgerClick={handleSidebarClick} isAdmin={isAdmin} />
+      );
+    else
+      setCurrentComponent(
+        <Discussions setCurrentComponent={setCurrentComponent} />
+      );
   }, []);
 
   const handleSidebarClick = (component) => {
@@ -102,6 +108,7 @@ const Collaboration = () => {
     onSnapshot(collaborationDocRef, (doc) => {
       setIsPrivate(doc.data().isPrivate);
       setIsAdmin(doc.data().uid === user.id);
+      setAdminId(doc.data().uid);
     });
 
     onSnapshot(doc(db, "collaborations", uid, "users", user.id), (doc) => {
@@ -135,6 +142,16 @@ const Collaboration = () => {
           requestedName: user.name,
           requestedImage: "",
         }).then(() => console.log("request sent"));
+
+        if (user.id != adminId) {
+          addDoc(collection(db, "users", adminId, "notifications"), {
+            message: `${user.name} requested to join ${collabName}`,
+            type: "request",
+            collabId: uid,
+            createdAt: serverTimestamp(),
+            opened: false,
+          });
+        }
       }
     }
   };
@@ -156,6 +173,16 @@ const Collaboration = () => {
       setDoc(doc(db, "users", user.id, "collabs", uid), {
         collabName: collabName,
       });
+
+      if (user.id != adminId) {
+        addDoc(collection(db, "users", adminId, "notifications"), {
+          message: `${user.name} joined ${collabName}`,
+          type: "join",
+          collabId: uid,
+          createdAt: serverTimestamp(),
+          opened: false,
+        });
+      }
     }
   };
 
@@ -507,7 +534,7 @@ const Collaboration = () => {
                 </div>
               </li>
 
-              {isAdmin && (
+              {isAdmin && isPrivate && (
                 <li>
                   <div
                     className="flex items-center p-2 text-gray-500 rounded-lg dark:text-white hover:bg-gray-100/10 dark:hover:bg-gray-700 cursor-pointer"

@@ -17,6 +17,7 @@ import Profile from "./pages/Profile/Profile";
 import Meeting from "./pages/Meetings/Meeting";
 import Profile2 from "./pages/Profile/Profile2";
 import Page404 from "./pages/Page404";
+import Notifications from "./pages/Notifications/Notifications";
 
 function App() {
   const location = useLocation();
@@ -47,6 +48,7 @@ function App() {
         <Route path="/main/:uid" element={<Collaboration />} />
         {/* <Route path="/profile" element={<Profile />} /> */}
         <Route path="/profile/:userId" element={<Profile2 />} />
+        <Route path="/notifications" element={<Notifications/>} />
         <Route path="/main/:uid/:mid" element={<Meeting />} />
         <Route path="*" element={<Page404 />} />
       </Routes>

@@ -17,7 +17,11 @@ const Notifications = () => {
   const navigate = useNavigate();
 
   const handleNotificationClick = (notification) => {
-    if (notification.type === "comment" || notification.type === "answer") {
+    if (
+      notification.type === "comment" ||
+      notification.type === "answer" ||
+      notification.type === "discussion"
+    ) {
       getDoc(doc(db, "collaborations", notification.collabId)).then(
         (collab) => {
           navigate(`/main/${notification.collabId}`, {
@@ -50,13 +54,25 @@ const Notifications = () => {
           });
         }
       );
+    } else if (notification.type === "accepted") {
+      getDoc(doc(db, "collaborations", notification.collabId)).then(
+        (collab) => {
+          navigate(`/main/${notification.collabId}`, {
+            state: {
+              collabName: collab.data().title,
+            },
+          });
+        }
+      );
     }
   };
 
   useEffect(() => {
     getDocs(
-      query(collection(db, "users", user.id, "notifications")),
-      orderBy("createdAt", "desc")
+      query(
+        collection(db, "users", user.id, "notifications"),
+        orderBy("createdAt", "desc")
+      )
     ).then((res) => {
       setAllNotifications(
         res.docs.map((notification) => (

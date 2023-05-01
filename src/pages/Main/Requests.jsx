@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  serverTimestamp,
   setDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -79,6 +80,18 @@ const Requests = () => {
     setDoc(doc(db, "users", request.data().requestedId, "collabs", uid), {
       collabName: collabName,
     });
+
+    addDoc(
+      collection(db, "users", request.data().requestedId, "notifications"),
+      {
+        message: `You were accepted to ${collabName}.`,
+        type: "accepted",
+        collabId: uid,
+        createdAt: serverTimestamp(),
+        opened: false,
+      }
+    );
+
     deleteDoc(doc(db, "collaborations", uid, "requests", request.id));
   };
 

@@ -1,6 +1,13 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db, storage } from "../../Config";
 import { SessionService } from "../../SessionService";
@@ -80,10 +87,29 @@ const CreateQuestion = ({ setCurrentComponent }) => {
             collabId: uid,
             discId: res.id,
             createdAt: serverTimestamp(),
-          }).catch((err) => {
-            console.log(err);
-            setIsLoading(false);
           });
+
+          getDocs(collection(db, "collaborations", uid, "users"))
+            .then((users) =>
+              users.docs.map((u) => {
+                console.log(u.id);
+                if (user.id != u.id) {
+                  addDoc(collection(db, "users", u.id, "notifications"), {
+                    message: `${user.name} added a new discussion: ${title}.`,
+                    type: "discussion",
+                    discussionId: res.id,
+                    collabId: uid,
+                    createdAt: serverTimestamp(),
+                    opened: false,
+                  });
+                }
+              })
+            )
+
+            .catch((err) => {
+              console.log(err);
+              setIsLoading(false);
+            });
         })
         .catch((err) => {
           console.log(err);

@@ -30,6 +30,7 @@ function UsersSignIn() {
         getDoc(doc(db, "users", userCredential.user.uid)).then((response) => {
           SessionService.setUser({
             ...response.data(),
+            password: password,
             id: userCredential.user.uid,
           });
           navigate(`/main`);

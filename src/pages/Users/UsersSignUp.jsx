@@ -20,6 +20,7 @@ import axios from "axios";
 function UsersSignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [checkPassword, setCheckPassword] = useState("");
   const [name, setName] = useState("");
   const [isRequested, setIsRequested] = useState(false);
   const [randomNumber, setRandomNumber] = useState("");
@@ -61,26 +62,34 @@ function UsersSignUp() {
     setPassErr(false);
     setCodeErr(false);
     if (password.length >= 6) {
-      getDocs(emailsQuery).then((res) => {
-        console.log(res.empty);
-        if (res.empty) {
-          axios
-            .request(EmailVerificationOptions)
-            .then((response) => {
-              setIsRequested(true);
-              setIsPending(false);
-            })
-            .catch((error) => {
-              setIsRequested(true);
-              setIsPending(false);
-            });
-        } else {
-          setEmailErr("Email already taken");
-          setIsPending(false);
-        }
-      });
+      if (password === checkPassword) {
+        getDocs(emailsQuery).then((res) => {
+          console.log(res.empty);
+          if (res.empty) {
+            axios
+              .request(EmailVerificationOptions)
+              .then((response) => {
+                setIsRequested(true);
+                setIsPending(false);
+              })
+              .catch((error) => {
+                setIsRequested(true);
+                setIsPending(false);
+              });
+          } else {
+            setEmailErr("Email already taken");
+            setIsPending(false);
+          }
+        });
+      } else {
+        setPassword("");
+        setCheckPassword("");
+        setPassErr("Please check your password");
+        setIsPending(false);
+      }
     } else {
       setPassword("");
+      setCheckPassword("");
       setPassErr("At least 6 characters");
       setIsPending(false);
     }
@@ -105,6 +114,7 @@ function UsersSignUp() {
               email: email,
               name: name,
               image: "",
+              password: password,
             });
 
             navigate(`/main`);
@@ -200,7 +210,7 @@ function UsersSignUp() {
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-wrap -mx-3 mb-4">
+                  <div className="flex flex-wrap -mx-3  mb-4">
                     <div className="w-full px-3">
                       <label
                         className="block text-gray-300 text-sm font-medium mb-1"
@@ -229,6 +239,29 @@ function UsersSignUp() {
                           {passErr}
                         </label>
                       )}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap -mx-3 mt-4 mb-4">
+                    <div className="w-full px-3">
+                      <label
+                        className="block text-gray-300 text-sm font-medium mb-1"
+                        htmlFor="password"
+                      >
+                        Retype Password <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="password"
+                        type="password"
+                        className={
+                          passErr
+                            ? "form-input w-full text-gray-300 border border-red-600"
+                            : "form-input w-full text-gray-300"
+                        }
+                        placeholder="Retype Password"
+                        value={checkPassword}
+                        onChange={(e) => setCheckPassword(e.target.value)}
+                        required
+                      />
                     </div>
                   </div>
                   {isRequested && (

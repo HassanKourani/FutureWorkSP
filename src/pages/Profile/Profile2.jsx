@@ -32,7 +32,10 @@ const Profile2 = () => {
   const [newName, setNewName] = useState(user.name);
   const [newDescription, setNewDescription] = useState(user.description);
   const [newPassword, setNewPassword] = useState("");
+  const [checkPassword, setCheckPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
   const [loader, setLoader] = useState("");
+  const [error, setError] = useState("");
   const [settingsComponent, setSettingsComponent] = useState("details");
   const authUser = auth.currentUser;
 
@@ -80,20 +83,57 @@ const Profile2 = () => {
       profile: user.profile,
       id: user.id,
       email: user.email,
+      password: user.password,
     });
     setUpdatedUser(SessionService.getUser());
   };
 
   const handleUpdatePassword = (e) => {
     setLoader("pass");
+    setError("");
     e.preventDefault();
-    updatePassword(authUser, newPassword)
-      .then(() => {
-        console.log("password updated");
+    if (oldPassword === user.password) {
+      if (newPassword === checkPassword) {
+        if (newPassword !== user.password) {
+          updatePassword(authUser, newPassword)
+            .then(() => {
+              console.log("password updated");
+              setNewPassword("");
+              setCheckPassword("");
+              setOldPassword("");
+              setLoader("");
+              SessionService.setUser({
+                name: user.name,
+                description: user.description,
+                banner: user.banner,
+                profile: user.profile,
+                id: user.id,
+                email: user.email,
+                password: newPassword,
+              });
+            })
+            .catch((err) => console.log(err));
+        } else {
+          setError("Can't use old password");
+          setNewPassword("");
+          setCheckPassword("");
+          setOldPassword("");
+          setLoader("");
+        }
+      } else {
+        setError("Passwords don't match");
         setNewPassword("");
+        setCheckPassword("");
+        setOldPassword("");
         setLoader("");
-      })
-      .catch((err) => console.log(err));
+      }
+    } else {
+      setError("Wrong password");
+      setNewPassword("");
+      setCheckPassword("");
+      setOldPassword("");
+      setLoader("");
+    }
   };
 
   const handleChangeBanner = (e) => {
@@ -116,6 +156,7 @@ const Profile2 = () => {
             profile: user.profile,
             id: user.id,
             email: user.email,
+            password: user.password,
           });
           setUpdatedUser(SessionService.getUser());
         });
@@ -142,6 +183,7 @@ const Profile2 = () => {
             profile: url,
             id: user.id,
             email: user.email,
+            password: user.password,
           });
           setUpdatedUser(SessionService.getUser());
         });
@@ -479,12 +521,27 @@ const Profile2 = () => {
                     settingsComponent === "password" && (
                       <div className="flex flex-col p-4  gap-4 items-start visible">
                         <input
-                          type="text"
+                          type="password"
+                          placeholder="Old Password"
+                          className="bg-gray-700/50 w-full rounded-lg"
+                          value={oldPassword}
+                          onChange={(e) => setOldPassword(e.target.value)}
+                        />
+                        <input
+                          type="password"
                           placeholder="New Password"
                           className="bg-gray-700/50 w-full rounded-lg"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                         />
+                        <input
+                          type="password"
+                          placeholder="Retype New Password"
+                          className="bg-gray-700/50 w-full rounded-lg"
+                          value={checkPassword}
+                          onChange={(e) => setCheckPassword(e.target.value)}
+                        />
+                        {error && <span>{error}</span>}
 
                         <button
                           className={

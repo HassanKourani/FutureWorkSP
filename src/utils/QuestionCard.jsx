@@ -106,7 +106,14 @@ const QuestionCard = ({ question, onClick, setCurrentComponent }) => {
 
         <div className="pl-8 pt-2 ">
           <h1 className="font-bold">{question.title}</h1>
-          <p className="mt-1">{question.question}</p>
+          <div className=" ">
+            <p className="mt-1">{question.question}</p>
+            {question.link && (
+              <a href={question.link} className="text-blue-600 underline">
+                Linked Material
+              </a>
+            )}
+          </div>
           <div className="flex justify-between items-start ">
             {question.image ? (
               <img src={question.image} className="max-h-32 mt-2	" />

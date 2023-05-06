@@ -17,6 +17,7 @@ import { db, storage } from "../../Config";
 import { SessionService } from "../../SessionService";
 import Loading from "../../utils/Loading";
 import QuestionCard from "../../utils/QuestionCard";
+import MaterialModal from "../../utils/MaterialModal";
 
 const Discussion = ({ discussionId, setCurrentComponent }) => {
   const [comment, setComment] = useState();
@@ -27,6 +28,8 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
   const [img, setImg] = useState("");
   const [allComments, setAllComments] = useState();
   const [discussion, setDiscussion] = useState();
+  const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false);
+  const [materialLink, setMaterialLink] = useState();
 
   const discussionDocRef = doc(
     db,
@@ -68,6 +71,7 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
         collabId: uid,
         createdAt: serverTimestamp(),
         opened: false,
+        link: materialLink,
       });
     }
   };
@@ -192,7 +196,15 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
                   </div>
 
                   <div className="pl-8 pt-2">
-                    <p className="mt-1">{comment.data().comment}</p>
+                    <p className="mt-1">{comment.data().comment} </p>
+                    {comment.data().link && (
+                      <a
+                        href={comment.data().link}
+                        className="text-blue-600 underline"
+                      >
+                        Linked Material
+                      </a>
+                    )}
                     {comment.data().image ? (
                       <img src={comment.data().image} />
                     ) : (
@@ -208,6 +220,7 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
         setAllComments(comments);
         setIsLoading(false);
       });
+      setMaterialLink("");
     });
   }, [discussion]);
 
@@ -244,6 +257,7 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
               userName: user.name,
               isAnswer: false,
               createdAt: serverTimestamp(),
+              link: materialLink,
             }
           )
             .then(() => {
@@ -273,7 +287,7 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
           userId: user.id,
           userName: user.name,
           isAnswer: false,
-
+          link: materialLink,
           createdAt: serverTimestamp(),
         }
       )
@@ -337,58 +351,114 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
                   >
                     {isLoading ? "Loading..." : "Post comment"}
                   </button>
-                  <div className=" flex items-center">
-                    {img && (
-                      <label
-                        className="flex items-center"
-                        onClick={() => {
-                          setImg("");
-                          setImage("");
-                        }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-5 h-5"
+                  <div className="flex gap-4">
+                    <div className="flex ">
+                      {materialLink && (
+                        <label
+                          className="flex items-center"
+                          onClick={() => {
+                            setMaterialLink("");
+                          }}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                      </label>
-                    )}
-                    <div className="flex pl-0 space-x-1 sm:pl-2">
-                      <label
-                        htmlFor="image"
-                        className="inline-flex items-center justify-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
-                      >
-                        {image ? "attached" : ""}
-                        <svg
-                          aria-hidden="true"
-                          className="w-5 h-5"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </label>
+                      )}
+                      <div className=" flex items-center">
+                        <div
+                          className="flex pl-0 space-x-1 sm:pl-2"
+                          onClick={() => setIsMaterialModalOpen(true)}
                         >
-                          <path
-                            fillRule="evenodd"
-                            d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"
-                            clipRule="evenodd"
+                          <label className="inline-flex items-center justify-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke={materialLink ? "green" : "currentColor"}
+                              className="w-5 h-5"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+                              />
+                            </svg>
+                          </label>
+                        </div>
+                      </div>
+                      <MaterialModal
+                        isOpen={isMaterialModalOpen}
+                        setIsOpen={setIsMaterialModalOpen}
+                        setMaterialLink={setMaterialLink}
+                      />
+                    </div>
+                    <div className="flex ">
+                      {img && (
+                        <label
+                          className="flex items-center"
+                          onClick={() => {
+                            setImg("");
+                            setImage("");
+                          }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </label>
+                      )}
+                      <div className="flex pl-0 space-x-1 sm:pl-2">
+                        <label
+                          htmlFor="image"
+                          className="inline-flex items-center justify-center p-2 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke={image ? "green" : "currentColor"}
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                            />
+                          </svg>
+
+                          <input
+                            type="file"
+                            id="image"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleAddImage}
                           />
-                        </svg>
-                        <input
-                          type="file"
-                          id="image"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleAddImage}
-                        />
-                      </label>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>

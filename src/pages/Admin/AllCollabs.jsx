@@ -44,8 +44,11 @@ const AllCollabs = ({ selectedFilter, search }) => {
   }, []);
   return (
     <>
-      {/* <span>Banned Collabs: </span> <span>{bannedCollabs.length}</span> */}
       <span>All Collabs: </span> <span>{allCollabs.length}</span>
+      <span>Active Collabs: </span>{" "}
+      <span>{allCollabs.filter((collab) => !collab.isBanned).length}</span>
+      <span>Banned Collabs: </span>{" "}
+      <span>{allCollabs.filter((collab) => collab.isBanned).length}</span>
       {filteredCollabs &&
         filteredCollabs.map((collab) => {
           return (

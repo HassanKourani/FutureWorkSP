@@ -46,6 +46,10 @@ const AllUsers = ({ selectedFilter, search }) => {
     <>
       {/* <span>Banned Users: </span> <span>{bannedUsers.length}</span> */}
       <span>All Users: </span> <span>{allUsers.length}</span>
+      <span>Active Users: </span>{" "}
+      <span>{allUsers.filter((user) => !user.isBanned).length}</span>
+      <span>Banned Users: </span>{" "}
+      <span>{allUsers.filter((user) => user.isBanned).length}</span>
       {filteredUsers &&
         filteredUsers.map((user) => {
           return (

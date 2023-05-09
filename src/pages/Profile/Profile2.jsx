@@ -23,6 +23,7 @@ import { updatePassword } from "firebase/auth";
 
 const Profile2 = () => {
   const user = SessionService.getUser();
+  !user && window.location.assign("/");
   const [updatedUser, setUpdatedUser] = useState();
   const [allDiscs, setAllDiscs] = useState();
   const [allCollabs, setAllCollabs] = useState();

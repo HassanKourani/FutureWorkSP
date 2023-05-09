@@ -11,14 +11,22 @@ import FancyCard from "../../utils/FancyCard";
 import { useNavigate } from "react-router-dom";
 
 const Main = () => {
+  const navigate = useNavigate();
   const user = SessionService.getUser();
-  const domain = user.email.split("@")[1];
+  let domain;
+  try {
+    domain = user.email.split("@")[1];
+  } catch (error) {
+    console.log(error);
+    window.location.assign("/");
+  }
+
   const [collaborations, setCollaborations] = useState();
   const [searchedCollabs, setSearchedCollabs] = useState();
   const [favCollabs, setFavCollabs] = useState();
   const [search, setSearch] = useState("");
   const [pending, setPending] = useState(true);
-  const navigate = useNavigate();
+
   const q = query(
     collection(db, "collaborations"),
     where("domain", "==", domain)

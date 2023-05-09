@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 const Notifications = () => {
   const user = SessionService.getUser();
+  !user && window.location.assign("/");
   const [allNotifications, setAllNotifications] = useState();
   const navigate = useNavigate();
 

@@ -39,14 +39,21 @@ const Collaboration = () => {
   const navigate = useNavigate();
   const collaborationDocRef = doc(db, "collaborations", uid);
   const usersColRef = collection(db, "collaborations", uid, "users");
-  const userQuery = query(usersColRef, where("userId", "==", user.id));
+  // const userQuery = query(usersColRef, where("userId", "==", user.id));
   const [isRequested, setIsRequested] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateMeetingModalOpen, setIsCreateMeetingModalOpen] =
     useState(false);
   const [requestsCount, setRequestsCount] = useState("0");
-  const { state } = useLocation();
-  const { collabName, discId = null, request = null, detail = null } = state;
+  const { state = null } = useLocation();
+  !state && window.location.assign("/");
+  const {
+    collabName = null,
+    discId = null,
+    request = null,
+    detail = null,
+  } = state;
+
   const [adminId, setAdminId] = useState();
 
   useEffect(() => {

@@ -50,7 +50,7 @@ const CreateQuestion = ({ setCurrentComponent }) => {
             userName: user.name,
             isAnswered: false,
             createdAt: serverTimestamp(),
-            link: materialLink,
+            link: materialLink || null,
           })
             .then((res) => {
               setIsLoading(false);
@@ -81,7 +81,7 @@ const CreateQuestion = ({ setCurrentComponent }) => {
         userName: user.name,
         isAnswered: false,
         createdAt: serverTimestamp(),
-        link: materialLink,
+        link: materialLink || null,
       })
         .then((res) => {
           setIsLoading(false);
@@ -106,7 +106,7 @@ const CreateQuestion = ({ setCurrentComponent }) => {
                     collabId: uid,
                     createdAt: serverTimestamp(),
                     opened: false,
-                    link: materialLink,
+                    link: materialLink || null,
                   });
                 }
               })

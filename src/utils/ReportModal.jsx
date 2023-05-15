@@ -36,27 +36,38 @@ const ReportModal = ({ isOpen, setIsOpen, onClick, setType }) => {
                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
                   Report!
                 </h3>
-                <input
-                  type="radio"
-                  value="abuse"
-                  name="report"
-                  onClick={(e) => setType(e.target.value)}
-                />
-                <label>Harassment or bullying</label>
-                <input
-                  type="radio"
-                  value="spam"
-                  name="report"
-                  onClick={(e) => setType(e.target.value)}
-                />
-                <label>Spam</label>
-                <input
-                  type="radio"
-                  value="misinformation"
-                  name="report"
-                  onClick={(e) => setType(e.target.value)}
-                />
-                <label>Misinformation</label>
+                <div className="flex justify-center">
+                  <div className="flex flex-col items-start gap-2 mb-4">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        value="abuse"
+                        name="report"
+                        onClick={(e) => setType(e.target.value)}
+                      />
+                      <label>Harassment or bullying</label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        value="spam"
+                        name="report"
+                        onClick={(e) => setType(e.target.value)}
+                      />
+                      <label>Spam</label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        value="misinformation"
+                        name="report"
+                        onClick={(e) => setType(e.target.value)}
+                      />
+
+                      <label>Misinformation</label>
+                    </div>
+                  </div>
+                </div>
                 <button
                   data-modal-hide="popup-modal"
                   type="button"

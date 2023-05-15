@@ -73,7 +73,25 @@ const QuestionCard = ({ question, onClick, setCurrentComponent }) => {
   const handleReport = (e) => {
     e.preventDefault();
     console.log(type);
-    addDoc(collection(db, "reports"), { collabId: uid, discId: question.id });
+
+    getDoc(doc(db, "reports", question.id)).then((res) => {
+      if (!res.data()) {
+        setDoc(doc(db, "reports", question.id), {
+          collabId: uid,
+        }).then(() => {
+          addDoc(collection(db, "reports", question.id, "users"), {
+            type: type,
+            reporterId: user.id,
+          });
+        });
+      } else {
+        addDoc(collection(db, "reports", question.id, "users"), {
+          type: type,
+          reporterId: user.id,
+        });
+      }
+    });
+
     setDoc(
       doc(
         db,
@@ -86,6 +104,7 @@ const QuestionCard = ({ question, onClick, setCurrentComponent }) => {
       ),
       { type: type }
     );
+    setIsReportModalOpen(false);
   };
 
   return (

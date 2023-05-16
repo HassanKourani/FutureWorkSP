@@ -6,6 +6,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -308,19 +309,31 @@ const Profile2 = () => {
       });
     });
 
-    onSnapshot(foldersColRef, (snapshot) => {
-      setFolders(
-        snapshot.docs.map((folder) => {
-          return (
-            <Fragment key={folder.id}>
-              <ProfileAccordionFolder
-                folder={{ ...folder.data(), id: folder.id }}
-              />
-            </Fragment>
-          );
-        })
-      );
-    });
+    onSnapshot(
+      foldersColRef,
+      (snapshot) => {
+        const folderPromises = snapshot.docs.map((folder) => {
+          return getDocs(
+            collection(db, "users", uid, "folders", folder.id, "materials")
+          ).then((res) => {
+            if (res.docs.length > 0) {
+              return (
+                <Fragment key={folder.id}>
+                  <ProfileAccordionFolder
+                    folder={{ ...folder.data(), id: folder.id }}
+                  />
+                </Fragment>
+              );
+            }
+          });
+        });
+
+        Promise.all(folderPromises).then((folders) => {
+          setFolders(folders.filter((folder) => folder));
+        });
+      },
+      []
+    );
   }, []);
 
   useEffect(() => {

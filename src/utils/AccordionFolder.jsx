@@ -48,19 +48,17 @@ const AccordionFolder = ({ folder }) => {
       )
     );
 
-    //Delete materials from users
-
-    // deleteDoc(
-    //   doc(
-    //     db,
-    //     "users",
-    //     user.id,
-    //     "folders",
-    //     folder.id,
-    //     "materials",
-    //     selectedMaterial
-    //   )
-    // );
+    deleteDoc(
+      doc(
+        db,
+        "users",
+        user.id,
+        "folders",
+        folder.id,
+        "materials",
+        selectedMaterial
+      )
+    );
   };
 
   useEffect(() => {
@@ -91,7 +89,7 @@ const AccordionFolder = ({ folder }) => {
                   />
                 </svg>
               </a>
-              {user.id === folder.userId && (
+              {user.id === material.data().userId && (
                 <span
                   onClick={(e) => {
                     e.stopPropagation();

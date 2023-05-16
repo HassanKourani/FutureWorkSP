@@ -25,11 +25,25 @@ const Notifications = () => {
     ) {
       getDoc(doc(db, "collaborations", notification.collabId)).then(
         (collab) => {
-          navigate(`/main/${notification.collabId}`, {
-            state: {
-              collabName: collab.data().title,
-              discId: notification.discussionId,
-            },
+          getDoc(
+            doc(
+              db,
+              "collaborations",
+              notification.collabId,
+              "discussions",
+              notification.discussionId
+            )
+          ).then((discRes) => {
+            if (discRes.exists()) {
+              navigate(`/main/${notification.collabId}`, {
+                state: {
+                  collabName: collab.data().title,
+                  discId: notification.discussionId,
+                },
+              });
+            } else {
+              console.log("The discussion is not available");
+            }
           });
         }
       );

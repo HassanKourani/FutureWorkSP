@@ -1,7 +1,13 @@
 import { getDownloadURL, ref, uploadBytes } from "@firebase/storage";
 import { useState } from "react";
 import { db, storage } from "../../Config";
-import { addDoc, collection, doc, serverTimestamp } from "@firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  setDoc,
+} from "@firebase/firestore";
 import { useParams } from "react-router";
 import { SessionService } from "../../SessionService";
 
@@ -43,7 +49,7 @@ const PostMaterial = () => {
         folderName: title,
         userId: user.id,
       }).then((res) => {
-        addDoc(collection(db, "users", user.id, "folders"), {
+        setDoc(doc(db, "users", user.id, "folders", res.id), {
           folderName: title,
           userId: user.id,
         }).then((userRes) => {
@@ -52,26 +58,6 @@ const PostMaterial = () => {
             const fileRef = ref(storage, file.name);
             uploadBytes(fileRef, file).then(() => {
               getDownloadURL(fileRef).then((url) => {
-                addDoc(
-                  collection(
-                    db,
-                    "users",
-                    user.id,
-                    "folders",
-                    userRes.id,
-                    "materials"
-                  ),
-                  {
-                    name: file.name,
-                    type: "",
-                    link: url,
-                    userId: user.id,
-                    createdAt: serverTimestamp(),
-                  }
-                ).catch((err) => {
-                  console.log(err);
-                });
-
                 addDoc(
                   collection(
                     db,
@@ -89,9 +75,29 @@ const PostMaterial = () => {
                     createdAt: serverTimestamp(),
                   }
                 )
-                  .then(() => {
+                  .then((response) => {
                     if (i === files.length) setIsLoading(false);
                     i++;
+                    setDoc(
+                      doc(
+                        db,
+                        "users",
+                        user.id,
+                        "folders",
+                        res.id,
+                        "materials",
+                        response.id
+                      ),
+                      {
+                        name: file.name,
+                        type: "",
+                        link: url,
+                        userId: user.id,
+                        createdAt: serverTimestamp(),
+                      }
+                    ).catch((err) => {
+                      console.log(err);
+                    });
                   })
                   .catch((err) => {
                     console.log(err);

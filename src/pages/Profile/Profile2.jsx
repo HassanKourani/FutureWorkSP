@@ -285,23 +285,24 @@ const Profile2 = () => {
           );
         })
       ).then((allValues) => {
-        console.log(allValues);
         setAllCollabs(
-          allValues.map((collab) => {
-            return (
-              <div
-                className="py-2 px-4 m-1 bg-gray-800/50 hover:bg-gray-700/50 cursor-pointer"
-                key={collab.id}
-                onClick={(e) => handleGoToCollab(e, collab.id)}
-              >
-                <div className="flex flex-col">
-                  <h1>{collab.title}</h1>
+          allValues
+            .filter((fCollab) => !fCollab.isBanned)
+            .map((collab) => {
+              return (
+                <div
+                  className="py-2 px-4 m-1 bg-gray-800/50 hover:bg-gray-700/50 cursor-pointer"
+                  key={collab.id}
+                  onClick={(e) => handleGoToCollab(e, collab.id)}
+                >
+                  <div className="flex flex-col">
+                    <h1>{collab.title}</h1>
 
-                  <h1>{collab.description}</h1>
+                    <h1>{collab.description}</h1>
+                  </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })
         );
         setIsLoading(false);
       });

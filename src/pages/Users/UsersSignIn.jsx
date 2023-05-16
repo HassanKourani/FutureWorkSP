@@ -4,7 +4,7 @@ import Header from "../../partials/Header";
 import PageIllustration from "../../partials/PageIllustration";
 import Banner from "../../partials/Banner";
 
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "../../Config";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,25 +17,33 @@ function UsersSignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const [isPending, setIsPending] = useState(false);
+  const [isBanned, setIsBanned] = useState(false);
   const navigate = useNavigate();
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
     setError(false);
+    setIsBanned(false);
     setIsPending(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
 
         getDoc(doc(db, "users", userCredential.user.uid)).then((response) => {
-          SessionService.setUser({
-            ...response.data(),
-            password: password,
-            id: userCredential.user.uid,
-          });
-          navigate(`/main`);
+          if (!response.data().isBanned) {
+            SessionService.setUser({
+              ...response.data(),
+              password: password,
+              id: userCredential.user.uid,
+            });
+            if (response.data().isAdmin) {
+              navigate("/admin");
+            } else navigate(`/main`);
+            setIsPending(false);
+          } else {
+            signOut(auth).then(() => setIsBanned(true));
+          }
         });
-        setIsPending(false);
       })
       .catch((error) => {
         setEmail("");
@@ -116,6 +124,14 @@ function UsersSignIn() {
                           htmlFor="password"
                         >
                           Wrong Email and/or Password
+                        </label>
+                      )}
+                      {isBanned && (
+                        <label
+                          className="font-extralight text-red-600 text-xs"
+                          htmlFor="password"
+                        >
+                          Account is not available
                         </label>
                       )}
                     </div>

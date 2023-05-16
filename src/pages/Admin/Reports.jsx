@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../Config";
 import { useEffect, useState } from "react";
+import Loading from "../../utils/Loading";
 
 const Reports = () => {
   const [reports, setReports] = useState();
@@ -96,6 +97,11 @@ const Reports = () => {
 
   return (
     <>
+      {!reports && (
+        <div className="flex justify-center">
+          <Loading />
+        </div>
+      )}
       {reports &&
         reports.map((report) => (
           <div className="bg-gray-800/50 p-4 mb-4 mx-4 cursor-pointer hover:bg-white/10">

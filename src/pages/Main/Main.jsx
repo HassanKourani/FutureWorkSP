@@ -36,19 +36,13 @@ const Main = () => {
   useEffect(() => {
     onSnapshot(q, (snapshot) => {
       setCollaborations(
-        snapshot.docs.map((collab) => {
-          return collab;
-        })
+        snapshot.docs.filter((collab) => !collab.data().isBanned)
       );
       setPending(false);
     });
 
     onSnapshot(favCollabsColRef, (snapshot) => {
-      setFavCollabs(
-        snapshot.docs.map((collab) => {
-          return collab;
-        })
-      );
+      setFavCollabs(snapshot.docs.filter((collab) => !collab.data().isBanned));
     });
   }, []);
 

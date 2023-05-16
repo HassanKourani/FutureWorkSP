@@ -12,6 +12,8 @@ import {
   query,
   where,
   getDocs,
+  getDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { SessionService } from "../../SessionService";
@@ -47,52 +49,100 @@ function UsersSignUp() {
       "X-RapidAPI-Key": "6c813d40eemsh4b85bd226d7efc3p13fc54jsn57726975d5dd",
       "X-RapidAPI-Host": "rapidprod-sendgrid-v1.p.rapidapi.com",
     },
-    data: `{"personalizations":[{"to":[{"email":"${email}"}],"subject":"OLAA"}],"from":{"email":"noreply@seniorproject-cd393.firebaseapp.com"},"content":[{"type":"text/plain","value":"Hello! Thank you for signing up to collaborative learning. Please verify your account using this code: ${randomNumber}"}]}`,
+    data: `{"personalizations":[{"to":[{"email":"${email}"}],"subject":"Verification"}],"from":{"email":"noreply@seniorproject-cd393.firebaseapp.com"},"content":[{"type":"text/plain","value":"Hello! Thank you for signing up to collaborative learning. Please verify your account using this code: ${randomNumber}"}]}`,
   };
 
   const emailsQuery = query(
     collection(db, "users"),
     where("email", "==", email)
   );
-
+  function isEduEmail(email) {
+    var domain = email.split("@")[1];
+    return domain.toLowerCase().includes(".edu");
+  }
   const handleVerifyEmail = (e) => {
     e.preventDefault();
     setIsPending(true);
     setEmailErr(false);
     setPassErr(false);
     setCodeErr(false);
-    if (password.length >= 6) {
-      if (password === checkPassword) {
-        getDocs(emailsQuery).then((res) => {
-          console.log(res.empty);
-          if (res.empty) {
-            axios
-              .request(EmailVerificationOptions)
-              .then((response) => {
-                setIsRequested(true);
-                setIsPending(false);
-              })
-              .catch((error) => {
-                setIsRequested(true);
-                setIsPending(false);
+    getDocs(
+      query(collection(db, "pendingAdmins")),
+      where("email", "==", email)
+    ).then((emailRes) => {
+      if (emailRes.empty) {
+        if (isEduEmail(email)) {
+          if (password.length >= 6) {
+            if (password === checkPassword) {
+              getDocs(emailsQuery).then((res) => {
+                console.log(res.empty);
+                if (res.empty) {
+                  axios
+                    .request(EmailVerificationOptions)
+                    .then((response) => {
+                      setIsRequested(true);
+                      setIsPending(false);
+                    })
+                    .catch((error) => {
+                      setIsRequested(true);
+                      setIsPending(false);
+                    });
+                } else {
+                  setEmailErr("Email already taken");
+                  setIsPending(false);
+                }
               });
+            } else {
+              setPassword("");
+              setCheckPassword("");
+              setPassErr("Please check your password");
+              setIsPending(false);
+            }
           } else {
-            setEmailErr("Email already taken");
+            setPassword("");
+            setCheckPassword("");
+            setPassErr("At least 6 characters");
             setIsPending(false);
           }
-        });
+        } else {
+          setEmailErr("Please enter a .edu email");
+          setIsPending(false);
+        }
       } else {
-        setPassword("");
-        setCheckPassword("");
-        setPassErr("Please check your password");
-        setIsPending(false);
+        if (password.length >= 6) {
+          if (password === checkPassword) {
+            getDocs(emailsQuery).then((res) => {
+              console.log(res.empty);
+              if (res.empty) {
+                axios
+                  .request(EmailVerificationOptions)
+                  .then((response) => {
+                    setIsRequested(true);
+                    setIsPending(false);
+                  })
+                  .catch((error) => {
+                    setIsRequested(true);
+                    setIsPending(false);
+                  });
+              } else {
+                setEmailErr("Email already taken");
+                setIsPending(false);
+              }
+            });
+          } else {
+            setPassword("");
+            setCheckPassword("");
+            setPassErr("Please check your password");
+            setIsPending(false);
+          }
+        } else {
+          setPassword("");
+          setCheckPassword("");
+          setPassErr("At least 6 characters");
+          setIsPending(false);
+        }
       }
-    } else {
-      setPassword("");
-      setCheckPassword("");
-      setPassErr("At least 6 characters");
-      setIsPending(false);
-    }
+    });
   };
 
   const handleFormSubmit = (e) => {
@@ -104,20 +154,45 @@ function UsersSignUp() {
     if (code == randomNumber) {
       createUserWithEmailAndPassword(auth, email, password)
         .then((res) => {
-          setDoc(doc(db, "users", res.user.uid), {
-            email: email,
-            name: name,
-            image: "",
-          }).then(() => {
-            SessionService.setUser({
-              id: res.user.uid,
-              email: email,
-              name: name,
-              image: "",
-              password: password,
-            });
+          getDocs(
+            query(collection(db, "pendingAdmins")),
+            where("email", "==", email)
+          ).then((paRes) => {
+            if (paRes.empty) {
+              setDoc(doc(db, "users", res.user.uid), {
+                email: email,
+                name: name,
+                image: "",
+              }).then(() => {
+                SessionService.setUser({
+                  id: res.user.uid,
+                  email: email,
+                  name: name,
+                  image: "",
+                  password: password,
+                });
 
-            navigate(`/main`);
+                navigate(`/main`);
+              });
+            } else {
+              setDoc(doc(db, "users", res.user.uid), {
+                email: email,
+                isAdmin: true,
+                name: name,
+              }).then(() => {
+                SessionService.setUser({
+                  id: res.user.uid,
+                  email: email,
+                  name: name,
+                  isAdmin: true,
+                  password: password,
+                });
+                paRes.forEach((doc) => {
+                  deleteDoc(doc.ref);
+                });
+                navigate(`/admin`);
+              });
+            }
           });
         })
         .catch((err) => {

@@ -12,7 +12,7 @@ const AdminMain = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBurgerOpen, setIsBurgerOpen] = useState(false);
   const user = SessionService.getUser();
-  !user && window.location.assign("/");
+  !user.isAdmin && window.location.assign("/");
   return (
     <>
       <nav className="bg-white border-gray-200 dark:bg-gray-900">

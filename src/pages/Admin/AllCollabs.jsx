@@ -36,7 +36,9 @@ const AllCollabs = () => {
   const handleCollabBan = (e, collabId, isBanned, collabUserId) => {
     e.preventDefault();
     updateDoc(doc(db, "collaborations", collabId), { isBanned: !isBanned });
-    updateDoc(doc(db, "users",collabUserId,"collabs", collabId), { isBanned: !isBanned });
+    updateDoc(doc(db, "users", collabUserId, "collabs", collabId), {
+      isBanned: !isBanned,
+    });
   };
 
   useEffect(() => {

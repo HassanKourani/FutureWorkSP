@@ -12,12 +12,17 @@ const AdminMain = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBurgerOpen, setIsBurgerOpen] = useState(false);
   const user = SessionService.getUser();
-  !user.isAdmin && window.location.assign("/");
+  !user?.isAdmin && window.location.assign("/");
   return (
     <>
       <nav className="bg-white border-gray-200 dark:bg-gray-900">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <Link to="/" className="block" aria-label="Cruip">
+          <Link
+            to="/"
+            className="block"
+            aria-label="Cruip"
+            onClick={() => SessionService.clearUser()}
+          >
             <svg
               className="w-8 h-8 fill-current text-purple-600"
               viewBox="0 0 32 32"

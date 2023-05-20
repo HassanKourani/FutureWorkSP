@@ -45,7 +45,12 @@ function MainHeader({ setSearch, search, handleSearch }) {
           {/* Site branding */}
           <div className="shrink-0 mr-4">
             {/* Logo */}
-            <Link to="/" className="block" aria-label="Cruip">
+            <Link
+              to="/"
+              className="block"
+              aria-label="Cruip"
+              onClick={() => SessionService.clearUser()}
+            >
               <svg
                 className="w-8 h-8 fill-current text-purple-600"
                 viewBox="0 0 32 32"

@@ -5,12 +5,14 @@ import AllUsers from "./AllUsers";
 import Reports from "./Reports";
 import AddAdmin from "./AddAdmin";
 import MobileBurger from "../../utils/MobileBurger";
+import { SessionService } from "../../SessionService";
 
 const AdminMain = () => {
   const [selectedComponent, setSelectedComponent] = useState("collabs");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBurgerOpen, setIsBurgerOpen] = useState(false);
-
+  const user = SessionService.getUser();
+  !user && window.location.assign("/");
   return (
     <>
       <nav className="bg-white border-gray-200 dark:bg-gray-900">

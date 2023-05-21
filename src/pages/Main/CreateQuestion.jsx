@@ -13,6 +13,7 @@ import { db, storage } from "../../Config";
 import { SessionService } from "../../SessionService";
 import Discussions from "./Discussions";
 import MaterialModal from "../../utils/MaterialModal";
+import CheckProfanity from "../../utils/ProfanityAPI";
 
 const CreateQuestion = ({ setCurrentComponent }) => {
   const [title, setTitle] = useState("");
@@ -35,17 +36,53 @@ const CreateQuestion = ({ setCurrentComponent }) => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
+
     if (isLoading) return;
     setIsLoading(true);
 
-    if (image) {
-      const imageRef = ref(storage, image.name);
-      uploadBytes(imageRef, image).then(() => {
-        getDownloadURL(imageRef).then((url) => {
+    Promise.all([CheckProfanity(title), CheckProfanity(question)]).then(
+      (censored) => {
+        console.log(censored);
+
+        if (image) {
+          const imageRef = ref(storage, image.name);
+          uploadBytes(imageRef, image).then(() => {
+            getDownloadURL(imageRef).then((url) => {
+              addDoc(collection(db, "collaborations", uid, "discussions"), {
+                title: censored[0],
+                question: censored[1],
+                image: url,
+                userId: user.id,
+                userName: user.name,
+                isAnswered: false,
+                createdAt: serverTimestamp(),
+                link: materialLink || null,
+              })
+                .then((res) => {
+                  setIsLoading(false);
+                  setCurrentComponent(
+                    <Discussions setCurrentComponent={setCurrentComponent} />
+                  );
+                  addDoc(collection(db, "users", user.id, "discussions"), {
+                    collabId: uid,
+                    discId: res.id,
+                    createdAt: serverTimestamp(),
+                  }).catch((err) => {
+                    console.log(err);
+                    setIsLoading(false);
+                  });
+                })
+                .catch((err) => {
+                  console.log(err);
+                  setIsLoading(false);
+                });
+            });
+          });
+        } else {
           addDoc(collection(db, "collaborations", uid, "discussions"), {
-            title: title,
-            question: question,
-            image: url,
+            title: censored[0],
+            question: censored[1],
+            image: "",
             userId: user.id,
             userName: user.name,
             isAnswered: false,
@@ -61,67 +98,38 @@ const CreateQuestion = ({ setCurrentComponent }) => {
                 collabId: uid,
                 discId: res.id,
                 createdAt: serverTimestamp(),
-              }).catch((err) => {
-                console.log(err);
-                setIsLoading(false);
               });
+
+              getDocs(collection(db, "collaborations", uid, "users"))
+                .then((users) =>
+                  users.docs.map((u) => {
+                    console.log(u.id);
+                    if (user.id != u.id) {
+                      addDoc(collection(db, "users", u.id, "notifications"), {
+                        message: `${user.name} added a new discussion: ${censored[0]}.`,
+                        type: "discussion",
+                        discussionId: res.id,
+                        collabId: uid,
+                        createdAt: serverTimestamp(),
+                        opened: false,
+                        link: materialLink || null,
+                      });
+                    }
+                  })
+                )
+
+                .catch((err) => {
+                  console.log(err);
+                  setIsLoading(false);
+                });
             })
             .catch((err) => {
               console.log(err);
               setIsLoading(false);
             });
-        });
-      });
-    } else {
-      addDoc(collection(db, "collaborations", uid, "discussions"), {
-        title: title,
-        question: question,
-        image: "",
-        userId: user.id,
-        userName: user.name,
-        isAnswered: false,
-        createdAt: serverTimestamp(),
-        link: materialLink || null,
-      })
-        .then((res) => {
-          setIsLoading(false);
-          setCurrentComponent(
-            <Discussions setCurrentComponent={setCurrentComponent} />
-          );
-          addDoc(collection(db, "users", user.id, "discussions"), {
-            collabId: uid,
-            discId: res.id,
-            createdAt: serverTimestamp(),
-          });
-
-          getDocs(collection(db, "collaborations", uid, "users"))
-            .then((users) =>
-              users.docs.map((u) => {
-                console.log(u.id);
-                if (user.id != u.id) {
-                  addDoc(collection(db, "users", u.id, "notifications"), {
-                    message: `${user.name} added a new discussion: ${title}.`,
-                    type: "discussion",
-                    discussionId: res.id,
-                    collabId: uid,
-                    createdAt: serverTimestamp(),
-                    opened: false,
-                    link: materialLink || null,
-                  });
-                }
-              })
-            )
-
-            .catch((err) => {
-              console.log(err);
-              setIsLoading(false);
-            });
-        })
-        .catch((err) => {
-          console.log(err);
-          setIsLoading(false);
-        });
-    }
+        }
+      }
+    );
   };
 
   return (

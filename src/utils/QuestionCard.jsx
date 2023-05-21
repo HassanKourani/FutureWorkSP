@@ -17,6 +17,7 @@ import Discussions from "../pages/Main/Discussions";
 import { db } from "../Config";
 import { SessionService } from "../SessionService";
 import ReportModal from "./ReportModal";
+import CheckProfanity from "./ProfanityAPI";
 
 const QuestionCard = ({ question, onClick, setCurrentComponent }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);

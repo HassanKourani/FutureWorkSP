@@ -18,6 +18,7 @@ import { SessionService } from "../../SessionService";
 import Loading from "../../utils/Loading";
 import QuestionCard from "../../utils/QuestionCard";
 import MaterialModal from "../../utils/MaterialModal";
+import CheckProfanity from "../../utils/ProfanityAPI";
 
 const Discussion = ({ discussionId, setCurrentComponent }) => {
   const [comment, setComment] = useState();
@@ -38,6 +39,14 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
     "discussions",
     discussionId
   );
+  useEffect(() => {
+    Promise.all([
+      CheckProfanity("fuck you"),
+      CheckProfanity("damn this shit"),
+    ]).then((res) => {
+      console.log(res);
+    });
+  }, []);
 
   useEffect(() => {
     onSnapshot(discussionDocRef, (doc) => {
@@ -239,80 +248,84 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
     if (isLoading) return;
     setIsLoading(true);
 
-    if (image) {
-      const imageRef = ref(storage, image.name);
-      uploadBytes(imageRef, image).then(() => {
-        getDownloadURL(imageRef).then((url) => {
-          addDoc(
-            collection(
-              db,
-              "collaborations",
-              uid,
-              "discussions",
-              discussion.id,
-              "comments"
-            ),
-            {
-              comment: comment,
-              image: url,
-              userId: user.id,
-              userName: user.name,
-              isAnswer: false,
-              createdAt: serverTimestamp(),
-              link: materialLink,
-            }
-          )
-            .then(() => {
-              setIsLoading(false);
-              setComment("");
-              setImage("");
-            })
-            .catch((err) => {
-              console.log(err);
-              setIsLoading(false);
-            });
-        });
-      });
-    } else {
-      addDoc(
-        collection(
-          db,
-          "collaborations",
-          uid,
-          "discussions",
-          discussion.id,
-          "comments"
-        ),
-        {
-          comment: comment,
-          image: "",
-          userId: user.id,
-          userName: user.name,
-          isAnswer: false,
-          link: materialLink,
-          createdAt: serverTimestamp(),
-        }
-      )
-        .then(() => {
-          setIsLoading(false);
-          setComment("");
-        })
-        .catch((err) => {
-          console.log(err);
-          setIsLoading(false);
-        });
-    }
+    CheckProfanity(comment).then((censored) => {
+      console.log(censored);
 
-    if (user.id != discussion.userId) {
-      addDoc(collection(db, "users", discussion.userId, "notifications"), {
-        message: `${user.name} commented on your discussion ${comment}`,
-        type: "comment",
-        discussionId: discussionId,
-        createdAt: serverTimestamp(),
-        collabId: uid,
-        opened: false,
-      });
-    }
+      if (image) {
+        const imageRef = ref(storage, image.name);
+        uploadBytes(imageRef, image).then(() => {
+          getDownloadURL(imageRef).then((url) => {
+            addDoc(
+              collection(
+                db,
+                "collaborations",
+                uid,
+                "discussions",
+                discussion.id,
+                "comments"
+              ),
+              {
+                comment: censored,
+                image: url,
+                userId: user.id,
+                userName: user.name,
+                isAnswer: false,
+                createdAt: serverTimestamp(),
+                link: materialLink,
+              }
+            )
+              .then(() => {
+                setIsLoading(false);
+                setComment("");
+                setImage("");
+              })
+              .catch((err) => {
+                console.log(err);
+                setIsLoading(false);
+              });
+          });
+        });
+      } else {
+        addDoc(
+          collection(
+            db,
+            "collaborations",
+            uid,
+            "discussions",
+            discussion.id,
+            "comments"
+          ),
+          {
+            comment: censored,
+            image: "",
+            userId: user.id,
+            userName: user.name,
+            isAnswer: false,
+            link: materialLink,
+            createdAt: serverTimestamp(),
+          }
+        )
+          .then(() => {
+            setIsLoading(false);
+            setComment("");
+          })
+          .catch((err) => {
+            console.log(err);
+            setIsLoading(false);
+          });
+      }
+
+      if (user.id != discussion.userId) {
+        addDoc(collection(db, "users", discussion.userId, "notifications"), {
+          message: `${user.name} commented on your discussion ${censored}`,
+          type: "comment",
+          discussionId: discussionId,
+          createdAt: serverTimestamp(),
+          collabId: uid,
+          opened: false,
+        });
+      }
+    });
   };
 
   return (

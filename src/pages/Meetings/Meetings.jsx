@@ -13,20 +13,24 @@ import Meeting from "./Meeting";
 import { SessionService } from "../../SessionService";
 import EmptyPage from "../../utils/EmptyPage";
 import Loading from "../../utils/Loading";
+import ConfirmationModal from "../../utils/ConfirmationModal";
+import SnackBar from "../../utils/SnackBar";
 
 const Meetings = () => {
   const [meetings, setMeetings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [meetingUser, setMeetingUser] = useState();
+  const [isOpen, setIsOpen] = useState(false);
+  const [meetingId, setMeetingId] = useState();
   const user = SessionService.getUser();
 
   const cid = useParams().uid;
   const meetingsColRef = collection(db, "collaborations", cid, "meetings");
 
-  const handleDelete = (e, id) => {
+  const handleDelete = (e) => {
     e.preventDefault();
-    const docRef = doc(db, "collaborations", cid, "meetings", id);
-    deleteDoc(docRef);
+    const docRef = doc(db, "collaborations", cid, "meetings", meetingId);
+    deleteDoc(docRef).then(() => setIsOpen(false));
   };
 
   useEffect(() => {
@@ -57,8 +61,11 @@ const Meetings = () => {
                 </div>
                 {user.id === meeting.data().uid && (
                   <div
-                    className="hover:text-red-500"
-                    onClick={(e) => handleDelete(e, meeting.id)}
+                    className="hover:text-red-500 cursor-pointer"
+                    onClick={() => {
+                      setIsOpen(true);
+                      setMeetingId(meeting.id);
+                    }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -81,22 +88,36 @@ const Meetings = () => {
               <div className="pl-4 text-lg">{meeting.data().name}</div>
               <div className="text-sm flex gap-2 items-center pl-4">
                 <div className="flex gap-2 ">
-                  <span>
-                    {new Date(meeting.data().startTime).toLocaleDateString()}{" "}
-                  </span>
+                  <div className="flex flex-col ">
+                    <span>From:</span>
+                    <div>
+                      <span>
+                        {new Date(
+                          meeting.data().startTime
+                        ).toLocaleDateString()}{" "}
+                      </span>
 
-                  <span>
-                    {new Date(meeting.data().startTime).toLocaleTimeString()}{" "}
-                  </span>
+                      <span>
+                        {new Date(
+                          meeting.data().startTime
+                        ).toLocaleTimeString()}{" "}
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 -
                 <div className="flex gap-2">
-                  <span>
-                    {new Date(meeting.data().endTime).toLocaleDateString()}{" "}
-                  </span>
-                  <span>
-                    {new Date(meeting.data().endTime).toLocaleTimeString()}{" "}
-                  </span>
+                  <div className="flex flex-col ">
+                    <span>To:</span>
+                    <div>
+                      <span>
+                        {new Date(meeting.data().endTime).toLocaleDateString()}{" "}
+                      </span>
+                      <span>
+                        {new Date(meeting.data().endTime).toLocaleTimeString()}{" "}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <a
@@ -112,7 +133,7 @@ const Meetings = () => {
       });
 
       const meetingComponents = await Promise.all(meetingPromises);
-      setMeetings(meetingComponents);
+      setMeetings(meetingComponents.filter((meet) => !!meet));
     });
   }, []);
 
@@ -127,6 +148,11 @@ const Meetings = () => {
       ) : (
         <EmptyPage message={"No meetings yet"} />
       )}
+      <ConfirmationModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        onClick={(e) => handleDelete(e)}
+      />
     </>
   );
 };

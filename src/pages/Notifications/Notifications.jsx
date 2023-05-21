@@ -11,12 +11,14 @@ import { db } from "../../Config";
 import { useEffect, useState } from "react";
 import { SessionService } from "../../SessionService";
 import { Link, useNavigate } from "react-router-dom";
+import SnackBar from "../../utils/SnackBar";
 
 const Notifications = () => {
   const user = SessionService.getUser();
   !user && window.location.assign("/");
   const [allNotifications, setAllNotifications] = useState();
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleNotificationClick = (notification, id) => {
     updateDoc(doc(db, "users", user.id, "notifications", id), { opened: true });
@@ -45,7 +47,7 @@ const Notifications = () => {
                 },
               });
             } else {
-              console.log("The discussion is not available");
+              setIsOpen(true);
             }
           });
         }
@@ -186,6 +188,7 @@ const Notifications = () => {
           <div className=""> {allNotifications}</div>
         </div>
       </div>
+      <SnackBar isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   );
 };

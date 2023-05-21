@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { db, storage } from "../../Config";
 import { SessionService } from "../../SessionService";
 import Loading from "../../utils/Loading";
@@ -132,25 +132,27 @@ const Discussion = ({ discussionId, setCurrentComponent }) => {
 
       Promise.all(promises).then((users) => {
         const comments = snapshot.docs.map((comment, index) => {
-          const user = users[index];
+          const u = users[index];
           return (
             <div key={comment.id}>
               {discussion && (
                 <div
                   className={
                     comment.data().isAnswer
-                      ? "border-2 border-green-500 p-4 mr-4  "
+                      ? "border border-green-500 p-4 mr-4  "
                       : "border-b-2 border-gray-400/50 p-4 mr-4  "
                   }
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex gap-4 items-center">
-                      <img
-                        className="w-8 h-8 rounded-full object-cover"
-                        src={user.data().profile}
-                        alt="user photo"
-                      />
-                      <h1>{user.data().name}</h1>
+                      <Link to={`/profile/${comment.data().userId}`}>
+                        <img
+                          className="w-8 h-8 rounded-full object-cover"
+                          src={u.data().profile}
+                          alt="user photo"
+                        />
+                      </Link>
+                      <h1>{u.data().name}</h1>
                     </div>
                     <div className="flex gap-4 items-center">
                       {comment.data().isAnswer &&

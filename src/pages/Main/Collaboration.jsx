@@ -270,6 +270,7 @@ const Collaboration = () => {
                   clipRule="evenodd"
                 />
               </svg>
+              <span className="text-xs text-gray-500">Posts</span>
             </button>
             {/* -----Second Icon----- */}
             <button
@@ -291,6 +292,7 @@ const Collaboration = () => {
                 />
                 <path d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
               </svg>
+              <span className="text-xs text-gray-500">Materials</span>
             </button>
             {/* -----Third Icon Add btn----- */}
             {(isJoined || !isPrivate) &&
@@ -373,7 +375,7 @@ const Collaboration = () => {
                   </button>
                 </div>
               )}
-            {!isJoined && isPrivate && (
+            {!isRequested && !isJoined && isPrivate && (
               <div className="flex items-center justify-center">
                 <button
                   data-tooltip-target="tooltip-new"
@@ -398,6 +400,60 @@ const Collaboration = () => {
                 </button>
               </div>
             )}
+            {isRequested && isPrivate && !isAdmin && (
+              <div className="flex items-center justify-center">
+                <button
+                  data-tooltip-target="tooltip-new"
+                  type="button"
+                  className="inline-flex items-center justify-center w-10 h-10 font-medium bg-gray-600 rounded-full hover:bg-gray-700 group focus:ring-4 focus:ring-purple-300 focus:outline-none dark:focus:ring-gray-800"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15M9 12l3 3m0 0l3-3m-3 3V2.25"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            {/*------------------------------ if public and im not the admin( join)----------------------------------- */}
+            {!isPrivate &&
+              !isAdmin &&
+              !isJoined &&
+              currentComponentName == "details" && (
+                <div className="flex items-center justify-center">
+                  <button
+                    data-tooltip-target="tooltip-new"
+                    type="button"
+                    className="inline-flex items-center justify-center w-10 h-10 font-medium bg-purple-600 rounded-full hover:bg-purple-700 group focus:ring-4 focus:ring-purple-300 focus:outline-none dark:focus:ring-purple-800"
+                    onClick={() => handleUserStatePublic()}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              )}
             {/* -----Fourth Icon----- */}
             <button
               data-tooltip-target="tooltip-wallet"
@@ -417,6 +473,7 @@ const Collaboration = () => {
                   clipRule="evenodd"
                 />
               </svg>
+              <span className="text-xs text-gray-500">Meetings</span>
             </button>
             {/* -----fifth Icon----- */}
             <button
@@ -438,6 +495,7 @@ const Collaboration = () => {
                 />
                 <path d="M5.082 14.254a8.287 8.287 0 00-1.308 5.135 9.687 9.687 0 01-1.764-.44l-.115-.04a.563.563 0 01-.373-.487l-.01-.121a3.75 3.75 0 013.57-4.047zM20.226 19.389a8.287 8.287 0 00-1.308-5.135 3.75 3.75 0 013.57 4.047l-.01.121a.563.563 0 01-.373.486l-.115.04c-.567.2-1.156.349-1.764.441z" />
               </svg>
+              <span className="text-xs text-gray-500">Details</span>
             </button>
           </div>
         </div>
@@ -660,9 +718,13 @@ const Collaboration = () => {
         </aside>
 
         <div className="pt-20 pl-4 sm:ml-64 ">
-          {isJoined || !isPrivate
-            ? currentComponent
-            : "You must request to join"}
+          {isJoined || !isPrivate ? (
+            currentComponent
+          ) : (
+            <div className="flex justify-center text-2xl text-purple-600/50">
+              You must request to join
+            </div>
+          )}
         </div>
       </div>
       <ConfirmationModal

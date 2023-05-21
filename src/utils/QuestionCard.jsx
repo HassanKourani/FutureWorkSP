@@ -12,7 +12,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Discussions from "../pages/Main/Discussions";
 import { db } from "../Config";
 import { SessionService } from "../SessionService";
@@ -116,11 +116,13 @@ const QuestionCard = ({ question, onClick, setCurrentComponent }) => {
         <div className="flex items-center justify-between">
           <div className="flex gap-4 items-center">
             {profile && (
-              <img
-                className="w-8 h-8 rounded-full object-cover"
-                src={profile}
-                alt="user photo"
-              />
+              <Link to={`/profile/${question.userId}`}>
+                <img
+                  className="w-8 h-8 rounded-full object-cover"
+                  src={profile}
+                  alt="user photo"
+                />
+              </Link>
             )}
             <h1>{userName}</h1>
           </div>

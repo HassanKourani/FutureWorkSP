@@ -28,6 +28,7 @@ function UsersSignUp() {
   const [randomNumber, setRandomNumber] = useState("");
   const [code, setCode] = useState("");
   const [passErr, setPassErr] = useState(false);
+  const [nameErr, setNameErr] = useState(false);
   const [emailErr, setEmailErr] = useState(false);
   const [codeErr, setCodeErr] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -62,10 +63,24 @@ function UsersSignUp() {
   }
   const handleVerifyEmail = (e) => {
     e.preventDefault();
-    setIsPending(true);
+
     setEmailErr(false);
+    setNameErr(false);
     setPassErr(false);
     setCodeErr(false);
+    if (!name) {
+      setNameErr("Please enter a name.");
+      return;
+    }
+    if (!email) {
+      setEmailErr("Please enter an email.");
+      return;
+    }
+    if (!password) {
+      setPassErr("Please enter an password.");
+      return;
+    }
+    setIsPending(true);
     getDocs(
       query(collection(db, "pendingAdmins")),
       where("email", "==", email)
@@ -245,12 +260,24 @@ function UsersSignUp() {
                       <input
                         id="full-name"
                         type="text"
-                        className="form-input w-full text-gray-300"
+                        className={
+                          nameErr
+                            ? "form-input w-full text-gray-300 border border-red-600"
+                            : "form-input w-full text-gray-300"
+                        }
                         placeholder="First and last name"
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                       />
+                      {nameErr && (
+                        <label
+                          className="font-extralight text-red-600 text-xs"
+                          htmlFor="password"
+                        >
+                          {nameErr}
+                        </label>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-4">
@@ -325,7 +352,7 @@ function UsersSignUp() {
                         Retype Password <span className="text-red-600">*</span>
                       </label>
                       <input
-                        id="password"
+                        id="retypePassword"
                         type="password"
                         className={
                           passErr
